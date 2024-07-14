@@ -1,20 +1,14 @@
 import {
   Canvas,
-  Paint,
   PaintStyle,
   Path,
   SkPoint,
   SkRect,
   Skia,
-  TileMode,
-  Shader,
-  Fill,
   dist,
   fitbox,
   processTransform2d,
   rect,
-  vec,
-  StrokeJoin,
   StrokeCap,
 } from '@shopify/react-native-skia'
 import { Dimensions, StyleSheet } from 'react-native'
@@ -26,7 +20,7 @@ import {
   withTiming,
   Easing,
 } from 'react-native-reanimated'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { svgPathProperties } from 'svg-path-properties'
 
 export const fitRect = (src: SkRect, dst: SkRect) =>
@@ -72,8 +66,82 @@ const hello = prepare(
   'M13.63 248.31C13.63 248.31 51.84 206.67 84.21 169.31C140.84 103.97 202.79 27.66 150.14 14.88C131.01 10.23 116.36 29.88 107.26 45.33C69.7 108.92 58.03 214.33 57.54 302.57C67.75 271.83 104.43 190.85 140.18 193.08C181.47 195.65 145.26 257.57 154.53 284.39C168.85 322.18 208.22 292.83 229.98 277.45C265.92 252.03 288.98 231.22 288.98 200.45C288.98 161.55 235.29 174.02 223.3 205.14C213.93 229.44 214.3 265.89 229.3 284.14C247.49 306.28 287.67 309.93 312.18 288.46C337 266.71 354.66 234.56 368.68 213.03C403.92 158.87 464.36 86.15 449.06 30.03C446.98 22.4 440.36 16.57 432.46 16.26C393.62 14.75 381.84 99.18 375.35 129.31C368.78 159.83 345.17 261.31 373.11 293.06C404.43 328.58 446.29 262.4 464.66 231.67C468.66 225.31 472.59 218.43 476.08 213.07C511.33 158.91 571.77 86.19 556.46 30.07C554.39 22.44 547.77 16.61 539.87 16.3C501.03 14.79 489.25 99.22 482.76 129.35C476.18 159.87 452.58 261.35 480.52 293.1C511.83 328.62 562.4 265.53 572.64 232.86C587.34 185.92 620.94 171.58 660.91 180.29C616 166.66 580.86 199.67 572.64 233.16C566.81 256.93 573.52 282.16 599.25 295.77C668.54 332.41 742.8 211.69 660.91 180.29C643.67 181.89 636.15 204.77 643.29 227.78C654.29 263.97 704.29 268.27 733.08 256',
 )
 
+const source = Skia.RuntimeEffect.Make(`
+  uniform float u_totalLength;
+  uniform float u_points[600]; // 100 samples * 2 coordinates (x and y)
+  uniform float u_distances[300];
+  uniform float u_searchThreshold;
+  uniform float u_colorThreshold; 
+  uniform int u_numBreakpoints;
+  uniform float u_breakpoints[100]; // assuming max 10 breakpoints
+  uniform float u_colors[400]; // 10 breakpoints * 4 (rgba)
+
+  float distanceSquared(vec2 p1, vec2 p2) {
+    vec2 diff = p1 - p2;
+    return dot(diff, diff);
+  }
+
+  float getClosestDistance(vec2 pos) {
+    float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
+    float bestDist = u_distances[0];
+
+    for (int i = 1; i < 300; i++) {
+      vec2 point = vec2(u_points[2 * i], u_points[2 * i + 1]);
+      float distSq = distanceSquared(pos, point);
+
+      if (distSq < minDistSq) {
+        minDistSq = distSq;
+        bestDist = u_distances[i];
+
+        if (distSq < u_searchThreshold * u_searchThreshold) {
+          break;
+        }
+      }
+    }
+
+    return bestDist;
+  }
+
+  vec4 getColorForDistance(float distanceAlongPath) {
+    vec4 color = vec4(0.0);
+    for (int i = 0; i < 100; i++) {
+      if (i >= u_numBreakpoints - 1) {
+        color = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], u_colors[4 * i + 3]);
+        break;
+      }
+      if (distanceAlongPath < u_breakpoints[i + 1] * u_totalLength) {
+        color = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], u_colors[4 * i + 3]);
+        break;
+      }
+    }
+    return color;
+  }
+
+vec4 getColorForDistanceMix(float distanceAlongPath) {
+  for (int i = 0; i < 100; i++) {
+    if (i >= u_numBreakpoints - 1 || distanceAlongPath < u_breakpoints[i + 1] * u_totalLength) {
+      vec4 color1 = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], u_colors[4 * i + 3]);
+      vec4 color2 = vec4(u_colors[4 * (i + 1)], u_colors[4 * (i + 1) + 1], u_colors[4 * (i + 1) + 2], u_colors[4 * (i + 1) + 3]);
+
+      float segmentStart = u_breakpoints[i] * u_totalLength;
+      float segmentEnd = u_breakpoints[i + 1] * u_totalLength;
+
+      float t = (distanceAlongPath - segmentStart) / (segmentEnd - segmentStart);
+      return mix(color1, color2, clamp(t, 0.0, 1.0));
+    }
+  }
+  return vec4(0.0); // Default color if no breakpoints are matched
+}
+
+  vec4 main(vec2 pos) {
+    float distanceAlongPath = getClosestDistance(pos);
+    return getColorForDistanceMix(distanceAlongPath);
+  }
+`)!
+
 export const Brain = () => {
-  const progress = useSharedValue(0.6)
+  const progress = useSharedValue(1)
+  const colorThreshold = 0.5
 
   const pathProgress = useDerivedValue(() => {
     const partOfPath = hello.slice(0, Math.floor(progress.value * hello.length))
@@ -82,30 +150,76 @@ export const Brain = () => {
       return `${acc} M${line.p1.x} ${line.p1.y} L${line.p2.x} ${line.p2.y}`
     }, '')
   })
-  const strokeWidth = 8
 
-  const pathProperties = new svgPathProperties(pathProgress.value)
-  const totalLength = pathProperties.getTotalLength()
+  const {
+    flattenedPoints,
+    flattenedDistances,
+    strokeWidth,
+    totalLength,
+    searchThreshold,
+  } = useMemo(() => {
+    const strokeWidth = 8
+    const pathProperties = new svgPathProperties(
+      hello.reduce((acc, line) => {
+        return `${acc} M${line.p1.x} ${line.p1.y} L${line.p2.x} ${line.p2.y}`
+      }, ''),
+    )
+    const totalLength = pathProperties.getTotalLength()
 
-  // Number of samples along the path
-  const numSamples = 300
-  const points = new Float32Array(numSamples * 2) // Array for storing x and y coordinates
-  const distances = new Float32Array(numSamples) // Array for storing distances
+    const numSamples = 300
+    const points = new Float32Array(numSamples * 2) // Array for storing x and y coordinates
+    const distances = new Float32Array(numSamples) // Array for storing distances
 
-  for (let i = 0; i < numSamples; i++) {
-    const t = i / (numSamples - 1) // Normalized position [0, 1]
-    const point = pathProperties.getPointAtLength(t * totalLength)
-    points[i * 2] = point.x
-    points[i * 2 + 1] = point.y
-    distances[i] = t * totalLength
-  }
+    for (let i = 0; i < numSamples; i++) {
+      const t = i / (numSamples - 1) // Normalized position [0, 1]
+      const point = pathProperties.getPointAtLength(t * totalLength)
+      points[i * 2] = point.x
+      points[i * 2 + 1] = point.y
+      distances[i] = t * totalLength
+    }
 
-  // Flatten arrays for passing to the shader
-  const flattenedPoints = Array.from(points)
-  const flattenedDistances = Array.from(distances)
-  const searchThreshold = Math.floor(strokeWidth / 2)
+    // Flatten arrays for passing to the shader
+    const flattenedPoints = Array.from(points)
+    const flattenedDistances = Array.from(distances)
+    const searchThreshold = Math.floor(strokeWidth / 2)
 
-  const colorThreshold = 0.65
+    return {
+      flattenedPoints,
+      flattenedDistances,
+      strokeWidth,
+      totalLength,
+      searchThreshold,
+    }
+  }, [])
+
+  const numMaxBreakpoints = 100
+  const numMaxColors = numMaxBreakpoints * 4
+
+  const colorBreakpoints = [
+    { breakpoint: 0.0, color: [1.0, 0.4, 0.4, 1.0] }, // Pastel Red
+    { breakpoint: 0.1, color: [1.0, 1.0, 0.4, 1.0] }, // Pastel Yellow
+    { breakpoint: 0.2, color: [0.4, 1.0, 0.4, 1.0] }, // Pastel Green
+    { breakpoint: 0.3, color: [0.4, 1.0, 1.0, 1.0] }, // Pastel Cyan
+    { breakpoint: 0.4, color: [0.4, 0.4, 1.0, 1.0] }, // Pastel Blue
+    { breakpoint: 0.5, color: [1.0, 0.4, 1.0, 1.0] }, // Pastel Magenta
+    { breakpoint: 0.6, color: [1.0, 0.6, 0.4, 1.0] }, // Pastel Orange
+    { breakpoint: 0.7, color: [0.6, 0.4, 1.0, 1.0] }, // Pastel Purple
+    { breakpoint: 0.8, color: [0.4, 1.0, 0.6, 1.0] }, // Pastel Mint
+    { breakpoint: 0.9, color: [1.0, 1.0, 0.6, 1.0] }, // Pastel Peach
+    { breakpoint: 1.0, color: [0.8, 0.8, 0.8, 1.0] }, // Light Grey
+  ]
+
+  // Prepare the breakpoints and colors for the shader
+  const breakpoints = new Array(numMaxBreakpoints).fill(0)
+  const colors = new Array(numMaxColors).fill(0)
+
+  colorBreakpoints.forEach((bp, index) => {
+    breakpoints[index] = bp.breakpoint
+    colors[index * 4] = bp.color[0]
+    colors[index * 4 + 1] = bp.color[1]
+    colors[index * 4 + 2] = bp.color[2]
+    colors[index * 4 + 3] = bp.color[3]
+  })
 
   const uniforms = [
     totalLength,
@@ -113,60 +227,16 @@ export const Brain = () => {
     ...flattenedDistances,
     searchThreshold,
     colorThreshold,
+    colorBreakpoints.length,
+    ...breakpoints,
+    ...colors,
   ]
-
-  const source = Skia.RuntimeEffect.Make(`
-    uniform float u_totalLength;
-    uniform float u_points[600]; // 100 samples * 2 coordinates (x and y)
-    uniform float u_distances[300];
-    uniform float u_searchThreshold;
-    uniform float u_colorThreshold; 
-  
-    float distanceSquared(vec2 p1, vec2 p2) {
-      vec2 diff = p1 - p2;
-      return dot(diff, diff);
-    }
-
-    float getClosestDistance(vec2 pos) {
-      float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
-      float bestDist = u_distances[0];
-
-      for (int i = 1; i < 300; i++) {
-        vec2 point = vec2(u_points[2 * i], u_points[2 * i + 1]);
-        float distSq = distanceSquared(pos, point);
-
-        if (distSq < minDistSq) {
-          minDistSq = distSq;
-          bestDist = u_distances[i];
-
-          if (distSq < u_searchThreshold * u_searchThreshold) {
-            break;
-          }
-        }
-      }
-
-      return bestDist;
-    }
-  
-    vec4 main(vec2 pos) {
-      float distanceAlongPath = getClosestDistance(pos);
-      
-      vec4 color;
-      if (distanceAlongPath < u_colorThreshold * u_totalLength) {
-        color = vec4(1, 0, 0, 1); // Red 
-      } else {
-        color = vec4(0, 1, 0, 1); // Green
-      }
-      
-      return color;
-    }
-  `)!
 
   // useEffect(() => {
   //   'worklet'
   //   progress.value = withRepeat(
   //     withTiming(1, {
-  //       duration: 1000,
+  //       duration: 5000,
   //       easing: Easing.linear,
   //     }),
   //     -1,
@@ -174,12 +244,12 @@ export const Brain = () => {
   // }, [])
 
   const shader = source.makeShader(uniforms)
-
   const paint = Skia.Paint()
   paint.setStrokeWidth(strokeWidth)
   paint.setStyle(PaintStyle.Stroke)
   paint.setShader(shader)
   paint.setStrokeCap(StrokeCap.Round)
+
   return (
     <Canvas style={{ flex: 1 }}>
       <Path path={pathProgress} style="stroke" paint={paint} />
