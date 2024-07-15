@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import {
-  PaintStyle,
   Path as SkiaPath,
   SkPoint,
   SkRect,
@@ -9,11 +8,11 @@ import {
   fitbox,
   processTransform2d,
   rect,
-  StrokeCap,
+  Shader,
 } from '@shopify/react-native-skia'
 import { Dimensions, StyleSheet } from 'react-native'
 import { PathGeometry, getPointAtLength } from './Geometry'
-import { useDerivedValue, SharedValue } from 'react-native-reanimated'
+import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { svgPathProperties } from 'svg-path-properties'
 import { source } from './Shader'
 
@@ -64,18 +63,6 @@ export const Path = ({
   colorBreakpoints: { breakpoint: number; color: number[] }[]
 }) => {
   const preparedPath = useMemo(() => prepare(svg), [svg])
-  const colorThreshold = 0.5
-
-  const pathProgress = useDerivedValue(() => {
-    const partOfPath = preparedPath.slice(
-      0,
-      Math.floor(progress.value * preparedPath.length),
-    )
-
-    return partOfPath.reduce((acc, line) => {
-      return `${acc} M${line.p1.x} ${line.p1.y} L${line.p2.x} ${line.p2.y}`
-    }, '')
-  })
 
   const {
     flattenedPoints,
@@ -86,13 +73,13 @@ export const Path = ({
     colors,
     breakpoints,
     numBreakpoints,
+    pathSVG,
   } = useMemo(() => {
     const strokeWidth = 8
-    const pathProperties = new svgPathProperties(
-      preparedPath.reduce((acc, line) => {
-        return `${acc} M${line.p1.x} ${line.p1.y} L${line.p2.x} ${line.p2.y}`
-      }, ''),
-    )
+    const pathSVG = preparedPath.reduce((acc, line) => {
+      return `${acc} M${line.p1.x} ${line.p1.y} L${line.p2.x} ${line.p2.y}`
+    }, '')
+    const pathProperties = new svgPathProperties(pathSVG)
     const totalLength = pathProperties.getTotalLength()
 
     const numSamples = 300
@@ -134,26 +121,28 @@ export const Path = ({
       colors,
       breakpoints,
       numBreakpoints: colorBreakpoints.length,
+      pathSVG,
     }
   }, [preparedPath])
 
-  const uniforms = [
-    totalLength,
-    ...flattenedPoints,
-    ...flattenedDistances,
-    searchThreshold,
-    colorThreshold,
-    numBreakpoints,
-    ...breakpoints,
-    ...colors,
-  ]
+  const uniforms = useDerivedValue(() => ({
+    u_totalLength: totalLength,
+    u_points: flattenedPoints,
+    u_distances: flattenedDistances,
+    u_searchThreshold: searchThreshold,
+    u_numBreakpoints: numBreakpoints,
+    u_breakpoints: breakpoints,
+    u_colors: colors,
+    u_progress: progress.value,
+  }))
 
-  const shader = source.makeShader(uniforms)
-  const paint = Skia.Paint()
-  paint.setStrokeWidth(strokeWidth)
-  paint.setStyle(PaintStyle.Stroke)
-  paint.setShader(shader)
-  paint.setStrokeCap(StrokeCap.Round)
-
-  return <SkiaPath path={pathProgress} style="stroke" paint={paint} />
+  return (
+    <SkiaPath
+      path={pathSVG}
+      style="stroke"
+      strokeWidth={strokeWidth}
+      strokeCap="round">
+      <Shader source={source} uniforms={uniforms} />
+    </SkiaPath>
+  )
 }
