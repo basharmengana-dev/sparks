@@ -57,9 +57,11 @@ export const prepare = (svg: string) => {
 export const Path = ({
   svg,
   progress,
+  colorBreakpoints,
 }: {
   svg: string
   progress: SharedValue<number>
+  colorBreakpoints: { breakpoint: number; color: number[] }[]
 }) => {
   const preparedPath = useMemo(() => prepare(svg), [svg])
   const colorThreshold = 0.5
@@ -81,6 +83,9 @@ export const Path = ({
     strokeWidth,
     totalLength,
     searchThreshold,
+    colors,
+    breakpoints,
+    numBreakpoints,
   } = useMemo(() => {
     const strokeWidth = 8
     const pathProperties = new svgPathProperties(
@@ -107,43 +112,30 @@ export const Path = ({
     const flattenedDistances = Array.from(distances)
     const searchThreshold = Math.floor(strokeWidth / 2)
 
+    const numMaxBreakpoints = 100
+    const numMaxColors = numMaxBreakpoints * 4
+    const breakpoints = new Array(numMaxBreakpoints).fill(0)
+    const colors = new Array(numMaxColors).fill(0)
+
+    colorBreakpoints.forEach((bp, index) => {
+      breakpoints[index] = bp.breakpoint
+      colors[index * 4] = bp.color[0]
+      colors[index * 4 + 1] = bp.color[1]
+      colors[index * 4 + 2] = bp.color[2]
+      colors[index * 4 + 3] = bp.color[3]
+    })
+
     return {
       flattenedPoints,
       flattenedDistances,
       strokeWidth,
       totalLength,
       searchThreshold,
+      colors,
+      breakpoints,
+      numBreakpoints: colorBreakpoints.length,
     }
   }, [preparedPath])
-
-  const numMaxBreakpoints = 100
-  const numMaxColors = numMaxBreakpoints * 4
-
-  const colorBreakpoints = [
-    { breakpoint: 0.0, color: [1.0, 0.4, 0.4, 1.0] }, // Pastel Red
-    { breakpoint: 0.1, color: [1.0, 1.0, 0.4, 1.0] }, // Pastel Yellow
-    { breakpoint: 0.2, color: [0.4, 1.0, 0.4, 1.0] }, // Pastel Green
-    { breakpoint: 0.3, color: [0.4, 1.0, 1.0, 1.0] }, // Pastel Cyan
-    { breakpoint: 0.4, color: [0.4, 0.4, 1.0, 1.0] }, // Pastel Blue
-    { breakpoint: 0.5, color: [1.0, 0.4, 1.0, 1.0] }, // Pastel Magenta
-    { breakpoint: 0.6, color: [1.0, 0.6, 0.4, 1.0] }, // Pastel Orange
-    { breakpoint: 0.7, color: [0.6, 0.4, 1.0, 1.0] }, // Pastel Purple
-    { breakpoint: 0.8, color: [0.4, 1.0, 0.6, 1.0] }, // Pastel Mint
-    { breakpoint: 0.9, color: [1.0, 1.0, 0.6, 1.0] }, // Pastel Peach
-    { breakpoint: 1.0, color: [0.8, 0.8, 0.8, 1.0] }, // Light Grey
-  ]
-
-  // Prepare the breakpoints and colors for the shader
-  const breakpoints = new Array(numMaxBreakpoints).fill(0)
-  const colors = new Array(numMaxColors).fill(0)
-
-  colorBreakpoints.forEach((bp, index) => {
-    breakpoints[index] = bp.breakpoint
-    colors[index * 4] = bp.color[0]
-    colors[index * 4 + 1] = bp.color[1]
-    colors[index * 4 + 2] = bp.color[2]
-    colors[index * 4 + 3] = bp.color[3]
-  })
 
   const uniforms = [
     totalLength,
@@ -151,7 +143,7 @@ export const Path = ({
     ...flattenedDistances,
     searchThreshold,
     colorThreshold,
-    colorBreakpoints.length,
+    numBreakpoints,
     ...breakpoints,
     ...colors,
   ]

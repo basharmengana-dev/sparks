@@ -24,5 +24,21 @@ export const Playground = () => {
   //     )
   //   }, [])
 
-  return <Path svg={hello} progress={progress} />
+  const colorBreakpoints = [
+    { breakpoint: 0.0, color: [1.0, 0.4, 0.4, 1.0] }, // Pastel Red
+    { breakpoint: 0.1, color: [1.0, 1.0, 0.4, 1.0] }, // Pastel Yellow
+    { breakpoint: 0.2, color: [0.4, 1.0, 0.4, 1.0] }, // Pastel Green
+    { breakpoint: 0.3, color: [0.4, 1.0, 1.0, 1.0] }, // Pastel Cyan
+    { breakpoint: 0.4, color: [0.4, 0.4, 1.0, 1.0] }, // Pastel Blue
+    { breakpoint: 0.5, color: [1.0, 0.4, 1.0, 1.0] }, // Pastel Magenta
+    { breakpoint: 0.6, color: [1.0, 0.6, 0.4, 1.0] }, // Pastel Orange
+    { breakpoint: 0.7, color: [0.6, 0.4, 1.0, 1.0] }, // Pastel Purple
+    { breakpoint: 0.8, color: [0.4, 1.0, 0.6, 1.0] }, // Pastel Mint
+    { breakpoint: 0.9, color: [1.0, 1.0, 0.6, 1.0] }, // Pastel Peach
+    { breakpoint: 1.0, color: [0.8, 0.8, 0.8, 1.0] }, // Light Grey
+  ]
+
+  return (
+    <Path svg={hello} progress={progress} colorBreakpoints={colorBreakpoints} />
+  )
 }
