@@ -19,7 +19,7 @@ import { source } from './Shader'
 export const fitRect = (src: SkRect, dst: SkRect) =>
   processTransform2d(fitbox('contain', src, dst))
 
-const pad = 75
+const pad = 10
 const { width, height } = Dimensions.get('window')
 export const dst = rect(pad, pad, width - pad * 2, height - pad * 2)
 
@@ -82,7 +82,7 @@ export const Path = ({
     const pathProperties = new svgPathProperties(pathSVG)
     const totalLength = pathProperties.getTotalLength()
 
-    const numSamples = 300
+    const numSamples = 500
     const points = new Float32Array(numSamples * 2) // Array for storing x and y coordinates
     const distances = new Float32Array(numSamples) // Array for storing distances
 

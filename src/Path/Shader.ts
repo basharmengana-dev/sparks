@@ -2,8 +2,8 @@ import { Skia } from '@shopify/react-native-skia'
 
 export const source = Skia.RuntimeEffect.Make(`
     uniform float u_totalLength;
-    uniform float u_points[600]; // 100 samples * 2 coordinates (x and y)
-    uniform float u_distances[300];
+    uniform float u_points[1000]; // 400 samples * 2 coordinates (x and y)
+    uniform float u_distances[500];
     uniform float u_searchThreshold;
     uniform int u_numBreakpoints;
     uniform float u_breakpoints[100]; // assuming max 10 breakpoints
@@ -19,7 +19,7 @@ export const source = Skia.RuntimeEffect.Make(`
       float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
       float bestDist = u_distances[0];
   
-      for (int i = 1; i < 300; i++) {
+      for (int i = 1; i < 500; i++) {
         vec2 point = vec2(u_points[2 * i], u_points[2 * i + 1]);
         float distSq = distanceSquared(pos, point);
   
@@ -34,21 +34,6 @@ export const source = Skia.RuntimeEffect.Make(`
       }
   
       return bestDist;
-    }
-  
-    vec4 getColorForDistance(float distanceAlongPath) {
-      vec4 color = vec4(0.0);
-      for (int i = 0; i < 100; i++) {
-        if (i >= u_numBreakpoints - 1) {
-          color = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], u_colors[4 * i + 3]);
-          break;
-        }
-        if (distanceAlongPath < u_breakpoints[i + 1] * u_totalLength) {
-          color = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], u_colors[4 * i + 3]);
-          break;
-        }
-      }
-      return color;
     }
   
   vec4 getColorForDistanceMix(float distanceAlongPath) {
