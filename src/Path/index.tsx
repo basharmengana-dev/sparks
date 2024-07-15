@@ -14,7 +14,7 @@ import { Dimensions, StyleSheet } from 'react-native'
 import { PathGeometry, getPointAtLength } from './Geometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { svgPathProperties } from 'svg-path-properties'
-import { source } from './Shader'
+import { shaderSource } from './Shader'
 
 export const fitRect = (src: SkRect, dst: SkRect) =>
   processTransform2d(fitbox('contain', src, dst))
@@ -142,7 +142,7 @@ export const Path = ({
       style="stroke"
       strokeWidth={strokeWidth}
       strokeCap="round">
-      <Shader source={source} uniforms={uniforms} />
+      <Shader source={shaderSource} uniforms={uniforms} />
     </SkiaPath>
   )
 }
