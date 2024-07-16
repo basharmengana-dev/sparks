@@ -14,22 +14,17 @@ import {
 export const fitRect = (src: SkRect, dst: SkRect) =>
   processTransform2d(fitbox('contain', src, dst))
 
-export const getPointAtLength = (length: number, from: Vector, to: Vector) => {
-  const angle = Math.atan2(to.y - from.y, to.x - from.x)
-  const x = from.x + length * Math.cos(angle)
-  const y = from.y + length * Math.sin(angle)
-  return vec(x, y)
-}
-
 export class PathGeometry {
   private totalLength = 0
   private contour: SkContourMeasure
+  public path: SkPath
 
   constructor(path: SkPath, resScale = 1) {
     const it = Skia.ContourMeasureIter(path, false, resScale)
     const contour: SkContourMeasure = it.next()!
     this.totalLength = contour.length()
     this.contour = contour
+    this.path = path
   }
 
   getTotalLength() {

@@ -1,56 +1,26 @@
 import { useMemo } from 'react'
 import {
   Path as SkiaPath,
-  SkPoint,
-  SkRect,
   Skia,
-  dist,
-  fitbox,
-  processTransform2d,
   rect,
   Shader,
 } from '@shopify/react-native-skia'
-import { Dimensions, StyleSheet } from 'react-native'
-import { PathGeometry, getPointAtLength } from './Geometry'
+import { Dimensions } from 'react-native'
+import { PathGeometry, fitRect } from './Geometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
-import { svgPathProperties } from 'svg-path-properties'
 import { shaderSource } from './Shader'
-
-export const fitRect = (src: SkRect, dst: SkRect) =>
-  processTransform2d(fitbox('contain', src, dst))
 
 const pad = 10
 const { width, height } = Dimensions.get('window')
 export const dst = rect(pad, pad, width - pad * 2, height - pad * 2)
-
-const tolerance = StyleSheet.hairlineWidth
-const tessellate = (
-  geo: PathGeometry,
-  t0: number,
-  t1: number,
-): { p1: SkPoint; p2: SkPoint; length: number }[] => {
-  const p0 = geo.getPointAtLength(t0)
-  const p1 = geo.getPointAtLength(t1)
-  const t05 = (t0 + t1) / 2
-  const p05 = getPointAtLength(0.5 * dist(p0, p1), p0, p1)
-  const c05 = geo.getPointAtLength(t05)
-  const d = dist(p05, c05)
-  if (d > tolerance || dist(p0, p1) > 40) {
-    return [...tessellate(geo, t0, t05), ...tessellate(geo, t05, t1)]
-  } else {
-    return [{ p1: p0, p2: p1, length: t0 }]
-  }
-}
 
 export const prepare = (svg: string) => {
   const path = Skia.Path.MakeFromSVGString(svg)!
   const src = path.computeTightBounds()
   const m3 = fitRect(src, dst)
   path.transform(m3)
-  const geo = new PathGeometry(path)
-  const totalLength = geo.getTotalLength()
-  const lines = tessellate(geo, 0, totalLength)
-  return lines
+
+  return new PathGeometry(path)
 }
 
 export const Path = ({
@@ -76,11 +46,8 @@ export const Path = ({
     pathSVG,
   } = useMemo(() => {
     const strokeWidth = 8
-    const pathSVG = preparedPath.reduce((acc, line) => {
-      return `${acc} M${line.p1.x} ${line.p1.y} L${line.p2.x} ${line.p2.y}`
-    }, '')
-    const pathProperties = new svgPathProperties(pathSVG)
-    const totalLength = pathProperties.getTotalLength()
+    const pathSVG = preparedPath.path.toSVGString()
+    const totalLength = preparedPath.getTotalLength()
 
     const numSamples = 500
     const points = new Float32Array(numSamples * 2) // Array for storing x and y coordinates
@@ -88,7 +55,7 @@ export const Path = ({
 
     for (let i = 0; i < numSamples; i++) {
       const t = i / (numSamples - 1) // Normalized position [0, 1]
-      const point = pathProperties.getPointAtLength(t * totalLength)
+      const point = preparedPath.getPointAtLength(t * totalLength)
       points[i * 2] = point.x
       points[i * 2 + 1] = point.y
       distances[i] = t * totalLength
