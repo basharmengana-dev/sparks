@@ -1,27 +1,13 @@
 import { useMemo } from 'react'
-import {
-  Path as SkiaPath,
-  Skia,
-  rect,
-  Shader,
-} from '@shopify/react-native-skia'
+import { Path as SkiaPath, rect, Shader } from '@shopify/react-native-skia'
 import { Dimensions } from 'react-native'
-import { PathGeometry, fitRect } from './Geometry'
+import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 
 const pad = 10
 const { width, height } = Dimensions.get('window')
-export const dst = rect(pad, pad, width - pad * 2, height - pad * 2)
-
-export const prepare = (svg: string) => {
-  const path = Skia.Path.MakeFromSVGString(svg)!
-  const src = path.computeTightBounds()
-  const m3 = fitRect(src, dst)
-  path.transform(m3)
-
-  return new PathGeometry(path)
-}
+export const dst = rect(0, 0, 150, 150)
 
 export const Path = ({
   svg,
@@ -32,7 +18,7 @@ export const Path = ({
   progress: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
 }) => {
-  const preparedPath = useMemo(() => prepare(svg), [svg])
+  const preparedPath = useMemo(() => new PathGeometry(svg, dst), [svg])
 
   const {
     flattenedPoints,
@@ -49,7 +35,7 @@ export const Path = ({
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
-    const numSamples = 500
+    const numSamples = 200
     const points = new Float32Array(numSamples * 2) // Array for storing x and y coordinates
     const distances = new Float32Array(numSamples) // Array for storing distances
 
@@ -64,7 +50,7 @@ export const Path = ({
     // Flatten arrays for passing to the shader
     const flattenedPoints = Array.from(points)
     const flattenedDistances = Array.from(distances)
-    const searchThreshold = Math.floor(strokeWidth / 2)
+    const searchThreshold = Math.floor(strokeWidth / 2) + 0.5
 
     const numMaxBreakpoints = 100
     const numMaxColors = numMaxBreakpoints * 4
