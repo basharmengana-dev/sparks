@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SharedValue } from 'react-native-reanimated'
 import {
-  Easing,
   interpolate,
   useSharedValue,
   useFrameCallback,
@@ -10,30 +9,22 @@ import {
   runOnUI,
 } from 'react-native-reanimated'
 
-type EasingFunction = (value: number) => number
-
-interface TimingConfig {
-  to?: number
-  easing?: EasingFunction
-  duration?: number
-}
-
-const defaultTimingConfig: Required<TimingConfig> = {
-  to: 1,
-  easing: Easing.inOut(Easing.ease),
-  duration: 600,
-}
-
 export function* timeSincePreviousFrame() {
   'worklet'
   const time: number = yield
   return time
 }
 
-export function* timing(value: SharedValue<number>, rawConfig?: TimingConfig) {
+type EasingFunction = (value: number) => number
+interface TimingConfig {
+  to: number
+  easing: EasingFunction
+  duration: number
+}
+export function* timing(value: SharedValue<number>, config: TimingConfig) {
   'worklet'
   const from = value.value
-  const { to, easing, duration } = { ...defaultTimingConfig, ...rawConfig }
+  const { to, easing, duration } = { ...config }
   const start: number = yield
   const end = start + duration
   for (let current = start; current < end; ) {
@@ -48,7 +39,6 @@ export function* timing(value: SharedValue<number>, rawConfig?: TimingConfig) {
 type AnimationValues<S> = {
   [K in keyof S]: SharedValue<S[K]>
 }
-
 type AnimationState = Record<string, unknown>
 type Animation<S extends AnimationState> = {
   animation: (state: AnimationValues<S>) => Generator
@@ -120,32 +110,3 @@ export const useAnimation = <S extends AnimationState>(
 
   return values
 }
-
-export const useProgress = () => {
-  const pause = useSharedValue(false)
-  const animation = makeAnimation(
-    function* ({ progress }) {
-      'worklet'
-      let to = 1
-      while (true) {
-        yield* timing(progress, { to, duration: 5000 })
-        to = to === 1 ? 0 : 1
-      }
-    },
-    {
-      progress: 0,
-    },
-  )
-
-  const { progress } = useAnimation(animation, pause)
-
-  return {
-    progress,
-    pause: () => {
-      pause.value = !pause.value
-    },
-    isPaused: pause.value,
-  }
-}
-
-export default useProgress
