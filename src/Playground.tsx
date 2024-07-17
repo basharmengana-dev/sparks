@@ -2,6 +2,7 @@ import { Button, Dimensions, View } from 'react-native'
 import { useProgressWithPause } from './Animations/useProgressWithPause'
 import { Path } from './Path'
 import { Canvas, rect } from '@shopify/react-native-skia'
+import { Easing } from 'react-native-reanimated'
 
 const hello = `M 357.00,1947.00
            C 445.11,1827.11 278.54,1416.83 579.00,1263.00
@@ -15,6 +16,8 @@ export const dst = rect(0, 100, 100, 100)
 
 export const Playground = () => {
   const { progress, pause, rerun, isPaused } = useProgressWithPause({
+    easing: Easing.out(Easing.ease),
+    duration: 700,
     repeat: false,
   })
 
@@ -37,6 +40,7 @@ export const Playground = () => {
       <Canvas style={{ flex: 1, backgroundColor: '#339933' }}>
         <Path
           svg={hello}
+          strokeWidth={3}
           dst={dst}
           progress={progress}
           colorBreakpoints={colorBreakpoints}

@@ -12,11 +12,13 @@ import { shaderSource } from './Shader'
 
 export const Path = ({
   svg,
+  strokeWidth,
   dst,
   progress,
   colorBreakpoints,
 }: {
   svg: string
+  strokeWidth: number
   dst: SkHostRect
   progress: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
@@ -26,7 +28,6 @@ export const Path = ({
   const {
     flattenedPoints,
     flattenedDistances,
-    strokeWidth,
     totalLength,
     searchThreshold,
     colors,
@@ -34,7 +35,6 @@ export const Path = ({
     numBreakpoints,
     pathSVG,
   } = useMemo(() => {
-    const strokeWidth = 8
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
@@ -71,7 +71,6 @@ export const Path = ({
     return {
       flattenedPoints,
       flattenedDistances,
-      strokeWidth,
       totalLength,
       searchThreshold,
       colors,
