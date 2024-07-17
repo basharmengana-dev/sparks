@@ -108,5 +108,5 @@ export const useAnimation = <S extends AnimationState>(
     }
   }, [])
 
-  return values
+  return { values, initializeGenerator }
 }

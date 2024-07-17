@@ -1,20 +1,23 @@
 import { useMemo } from 'react'
-import { Path as SkiaPath, rect, Shader } from '@shopify/react-native-skia'
+import {
+  Path as SkiaPath,
+  rect,
+  Shader,
+  SkHostRect,
+} from '@shopify/react-native-skia'
 import { Dimensions } from 'react-native'
 import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 
-const pad = 10
-const { width, height } = Dimensions.get('window')
-export const dst = rect(0, 0, 150, 150)
-
 export const Path = ({
   svg,
+  dst,
   progress,
   colorBreakpoints,
 }: {
   svg: string
+  dst: SkHostRect
   progress: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
 }) => {
