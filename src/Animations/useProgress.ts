@@ -2,14 +2,19 @@ import { runOnUI, useSharedValue } from 'react-native-reanimated'
 import { makeAnimation, timing, useAnimation } from './utils'
 import { EasingFunction } from 'react-native'
 
-export const useProgress = (options: {
-  repeat: boolean
-  easing: EasingFunction
+export const useProgress = ({
+  duration,
+  easing,
+  repeat = false,
+  waitUntilRun = true,
+}: {
   duration: number
-  waitUntilRun: boolean
+  easing: EasingFunction
+  repeat?: boolean
+  waitUntilRun?: boolean
 }) => {
   const pause = useSharedValue(false)
-  const run = useSharedValue(!options.waitUntilRun)
+  const run = useSharedValue(!waitUntilRun)
   const to = useSharedValue(1)
 
   const animation = makeAnimation(
@@ -19,10 +24,10 @@ export const useProgress = (options: {
       while (run.value) {
         yield* timing(progress, {
           to: to.value,
-          duration: options.duration,
-          easing: options.easing,
+          duration,
+          easing,
         })
-        if (options.repeat) {
+        if (repeat) {
           to.value = to.value === 1 ? 0 : 1
         }
       }

@@ -8,8 +8,9 @@ export const shaderSource = frag`
   uniform int u_numBreakpoints;
   uniform float u_breakpoints[100]; // assuming max 10 breakpoints
   uniform float u_colors[300]; // 10 breakpoints * 4 (rgba)
-  uniform float u_progress; // Add uniform for progress
-  uniform float u_alpha_progress; // Add uniform for progress
+  uniform float u_progress_front; // Add uniform for progress
+  uniform float u_progress_back; // Add uniform for progress
+  uniform float u_progress_alpha; // Add uniform for progress
 
   float distanceSquared(vec2 p1, vec2 p2) {
     vec2 diff = p1 - p2;
@@ -42,7 +43,7 @@ export const shaderSource = frag`
   }
 
   vec4 getColorForDistanceMix(float distanceAlongPath) {
-    if (distanceAlongPath > u_progress * u_totalLength) {
+    if (distanceAlongPath > u_progress_front * u_totalLength) {
       return vec4(0.0, 0.0, 0.0, 0.0); // Return transparent color
     }
 
@@ -57,7 +58,7 @@ export const shaderSource = frag`
         float t = (distanceAlongPath - segmentStart) / (segmentEnd - segmentStart);
         vec4 mixedColor = mix(color1, color2, clamp(t, 0.0, 1.0));
 
-        return applyAlphaToColor(mixedColor, u_alpha_progress);
+        return applyAlphaToColor(mixedColor, u_progress_alpha);
       }
     }
     return vec4(0.0); // Default color if no breakpoints are matched

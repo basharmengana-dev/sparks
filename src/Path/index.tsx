@@ -14,14 +14,16 @@ export const Path = ({
   svg,
   strokeWidth,
   dst,
-  progress,
+  progressFront,
+  progressBack,
   alphaProgress,
   colorBreakpoints,
 }: {
   svg: string
   strokeWidth: number
   dst: SkHostRect
-  progress: SharedValue<number>
+  progressFront: SharedValue<number>
+  progressBack: SharedValue<number>
   alphaProgress: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
 }) => {
@@ -89,8 +91,9 @@ export const Path = ({
     u_numBreakpoints: numBreakpoints,
     u_breakpoints: breakpoints,
     u_colors: colors,
-    u_progress: progress.value,
-    u_alpha_progress: alphaProgress.value,
+    u_progress_front: progressFront.value,
+    u_progress_back: progressBack.value,
+    u_progress_alpha: alphaProgress.value,
   }))
 
   return (

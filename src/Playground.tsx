@@ -29,14 +29,21 @@ const colorBreakpoints = [
 
 export const Playground = () => {
   const {
-    progress: progressWorm,
-    pause: pauseWorm,
-    run: runWorm,
+    progress: progressFront,
+    pause: pauseFront,
+    run: runFront,
   } = useProgress({
     easing: Easing.out(Easing.ease),
     duration: 700,
-    repeat: false,
-    waitUntilRun: true,
+  })
+
+  const {
+    progress: progressBack,
+    pause: pauseBack,
+    run: runBack,
+  } = useProgress({
+    easing: Easing.out(Easing.ease),
+    duration: 700,
   })
 
   const {
@@ -59,7 +66,8 @@ export const Playground = () => {
           strokeWidth={8}
           colorBreakpoints={colorBreakpoints}
           dst={rect(0, 100, 400, 400)}
-          progress={progressWorm}
+          progressFront={progressFront}
+          progressBack={progressBack}
           alphaProgress={progressAlpha}
         />
       </Canvas>
@@ -79,7 +87,7 @@ export const Playground = () => {
           title={'Pause'}
           onPress={() => {
             pauseAlpha()
-            pauseWorm()
+            pauseFront()
           }}
           color={'white'}
         />
@@ -87,7 +95,7 @@ export const Playground = () => {
           title={'Run'}
           onPress={() => {
             runAlpha()
-            runWorm()
+            runFront()
           }}
           color={'white'}
         />
