@@ -39,9 +39,10 @@ export const Playground = () => {
 
   const {
     progress: progressBack,
-    pause: pauseBack,
+    reset: resetBack,
     run: runBack,
   } = useProgress({
+    to: 0,
     easing: Easing.out(Easing.ease),
     duration: 700,
   })
@@ -94,8 +95,17 @@ export const Playground = () => {
         <Button
           title={'Run'}
           onPress={() => {
+            resetBack()
             runAlpha()
             runFront()
+          }}
+          color={'white'}
+        />
+        <Button
+          title={'Run back'}
+          onPress={() => {
+            runBack()
+            runInverseAlpha()
           }}
           color={'white'}
         />

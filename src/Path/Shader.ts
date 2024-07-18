@@ -47,6 +47,10 @@ export const shaderSource = frag`
       return vec4(0.0, 0.0, 0.0, 0.0); // Return transparent color
     }
 
+    if (distanceAlongPath < u_progress_back * u_totalLength) {
+      return vec4(0.0, 0.0, 0.0, 0.0); // Return transparent color for back progress
+    }
+
     for (int i = 0; i < 100; i++) {
       if (i >= u_numBreakpoints - 1 || distanceAlongPath < u_breakpoints[i + 1] * u_totalLength) {
         vec4 color1 = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], 1);

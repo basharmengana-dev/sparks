@@ -5,17 +5,19 @@ import { EasingFunction } from 'react-native'
 export const useProgress = ({
   duration,
   easing,
+  to = 1,
   repeat = false,
   waitUntilRun = true,
 }: {
   duration: number
   easing: EasingFunction
+  to?: number
   repeat?: boolean
   waitUntilRun?: boolean
 }) => {
   const pause = useSharedValue(false)
   const run = useSharedValue(!waitUntilRun)
-  const to = useSharedValue(1)
+  const toValue = useSharedValue(to)
 
   const animation = makeAnimation(
     function* ({ progress }) {
@@ -23,12 +25,12 @@ export const useProgress = ({
 
       while (run.value) {
         yield* timing(progress, {
-          to: to.value,
+          to: toValue.value,
           duration,
           easing,
         })
         if (repeat) {
-          to.value = to.value === 1 ? 0 : 1
+          toValue.value = toValue.value === 1 ? 0 : 1
         }
       }
     },
@@ -48,15 +50,20 @@ export const useProgress = ({
     },
     run: () => {
       runOnUI(initializeGenerator)()
-      to.value = 1
+      toValue.value = 1
       progress.value = 0
       run.value = true
     },
     runInverse: () => {
       runOnUI(initializeGenerator)()
-      to.value = 0
+      toValue.value = 0
       progress.value = 1
       run.value = true
+    },
+    reset: () => {
+      runOnUI(initializeGenerator)()
+      run.value = !waitUntilRun
+      progress.value = to
     },
   }
 }
