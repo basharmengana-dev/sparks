@@ -15,12 +15,14 @@ export const Path = ({
   strokeWidth,
   dst,
   progress,
+  alphaProgress,
   colorBreakpoints,
 }: {
   svg: string
   strokeWidth: number
   dst: SkHostRect
   progress: SharedValue<number>
+  alphaProgress: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
 }) => {
   const preparedPath = useMemo(() => new PathGeometry(svg, dst), [svg])
@@ -56,7 +58,7 @@ export const Path = ({
     const searchThreshold = Math.floor(strokeWidth / 2) + 0.5
 
     const numMaxBreakpoints = 100
-    const numMaxColors = numMaxBreakpoints * 4
+    const numMaxColors = numMaxBreakpoints * 3
     const breakpoints = new Array(numMaxBreakpoints).fill(0)
     const colors = new Array(numMaxColors).fill(0)
 
@@ -65,7 +67,6 @@ export const Path = ({
       colors[index * 4] = bp.color[0]
       colors[index * 4 + 1] = bp.color[1]
       colors[index * 4 + 2] = bp.color[2]
-      colors[index * 4 + 3] = bp.color[3]
     })
 
     return {
@@ -89,6 +90,7 @@ export const Path = ({
     u_breakpoints: breakpoints,
     u_colors: colors,
     u_progress: progress.value,
+    u_alpha_progress: alphaProgress.value,
   }))
 
   return (
@@ -96,7 +98,8 @@ export const Path = ({
       path={pathSVG}
       style="stroke"
       strokeWidth={strokeWidth}
-      strokeCap="round">
+      strokeCap="round"
+      blendMode={'srcOut'}>
       <Shader source={shaderSource} uniforms={uniforms} />
     </SkiaPath>
   )

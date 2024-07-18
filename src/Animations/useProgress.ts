@@ -1,32 +1,29 @@
-import {
-  Easing,
-  runOnUI,
-  useAnimatedReaction,
-  useSharedValue,
-} from 'react-native-reanimated'
+import { runOnUI, useSharedValue } from 'react-native-reanimated'
 import { makeAnimation, timing, useAnimation } from './utils'
 import { EasingFunction } from 'react-native'
 
-export const useProgressWithPause = (options: {
+export const useProgress = (options: {
   repeat: boolean
   easing: EasingFunction
   duration: number
+  waitUntilRun: boolean
 }) => {
   const pause = useSharedValue(false)
+  const run = useSharedValue(!options.waitUntilRun)
+  const to = useSharedValue(1)
 
   const animation = makeAnimation(
     function* ({ progress }) {
       'worklet'
-      let to = 1
 
-      while (true) {
+      while (run.value) {
         yield* timing(progress, {
-          to,
+          to: to.value,
           duration: options.duration,
           easing: options.easing,
         })
         if (options.repeat) {
-          to = to === 1 ? 0 : 1
+          to.value = to.value === 1 ? 0 : 1
         }
       }
     },
@@ -44,10 +41,17 @@ export const useProgressWithPause = (options: {
     pause: () => {
       pause.value = !pause.value
     },
-    rerun: () => {
-      progress.value = 0
+    run: () => {
       runOnUI(initializeGenerator)()
+      to.value = 1
+      progress.value = 0
+      run.value = true
     },
-    isPaused: pause.value,
+    runInverse: () => {
+      runOnUI(initializeGenerator)()
+      to.value = 0
+      progress.value = 1
+      run.value = true
+    },
   }
 }
