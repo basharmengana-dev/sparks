@@ -4,11 +4,42 @@ import {
   rect,
   Shader,
   SkHostRect,
+  Circle,
 } from '@shopify/react-native-skia'
 import { Dimensions } from 'react-native'
 import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
+
+function findClosestDistance(
+  points: Float32Array,
+  distances: Float32Array,
+): Float32Array {
+  const n = points.length / 2
+  let minDistance = Infinity
+
+  const intersection = new Float32Array(3)
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const x1 = points[2 * i]
+      const y1 = points[2 * i + 1]
+      const x2 = points[2 * j]
+      const y2 = points[2 * j + 1]
+
+      const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2))
+
+      if (distance < minDistance) {
+        minDistance = distance
+        intersection[0] = x2
+        intersection[1] = y2
+        intersection[2] = distances[j]
+      }
+    }
+  }
+
+  return intersection
+}
 
 export const Path = ({
   svg,
@@ -38,11 +69,12 @@ export const Path = ({
     breakpoints,
     numBreakpoints,
     pathSVG,
+    intersection,
   } = useMemo(() => {
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
-    const numSamples = 200
+    const numSamples = 500
     const points = new Float32Array(numSamples * 2) // Array for storing x and y coordinates
     const distances = new Float32Array(numSamples) // Array for storing distances
 
@@ -70,6 +102,8 @@ export const Path = ({
       colors[index * 4 + 1] = bp.color[1]
       colors[index * 4 + 2] = bp.color[2]
     })
+    const intersection = findClosestDistance(points, distances)
+    console.log('IntS: ', intersection, totalLength)
 
     return {
       flattenedPoints,
@@ -80,6 +114,7 @@ export const Path = ({
       breakpoints,
       numBreakpoints: colorBreakpoints.length,
       pathSVG,
+      intersection,
     }
   }, [preparedPath])
 
@@ -94,16 +129,19 @@ export const Path = ({
     u_progress_front: progressFront.value,
     u_progress_back: progressBack.value,
     u_progress_alpha: alphaProgress.value,
+    u_intersection: intersection,
   }))
 
   return (
-    <SkiaPath
-      path={pathSVG}
-      style="stroke"
-      strokeWidth={strokeWidth}
-      strokeCap="round"
-      blendMode={'srcOut'}>
-      <Shader source={shaderSource} uniforms={uniforms} />
-    </SkiaPath>
+    <>
+      <SkiaPath
+        path={pathSVG}
+        style="stroke"
+        strokeWidth={strokeWidth}
+        strokeCap="round">
+        <Shader source={shaderSource} uniforms={uniforms} />
+      </SkiaPath>
+      {/* <Circle cx={intersection[0]} cy={intersection[1]} r={1} color={'red'} /> */}
+    </>
   )
 }

@@ -1,7 +1,7 @@
 import { Button, Dimensions, View } from 'react-native'
 import { useProgress } from './Animations/useProgress'
 import { Path } from './Path'
-import { Canvas, rect } from '@shopify/react-native-skia'
+import { Canvas, Circle, rect } from '@shopify/react-native-skia'
 import { Easing, runOnJS, useAnimatedReaction } from 'react-native-reanimated'
 
 const svg = `
@@ -41,7 +41,7 @@ export const Playground = () => {
     run: runFront,
   } = useProgress({
     easing: Easing.out(Easing.ease),
-    duration: 2000,
+    duration: 500,
   })
 
   const {
@@ -51,7 +51,7 @@ export const Playground = () => {
   } = useProgress({
     to: 0,
     easing: Easing.out(Easing.ease),
-    duration: 2000,
+    duration: 5000,
   })
 
   const {
@@ -61,7 +61,7 @@ export const Playground = () => {
     runInverse: runInverseAlpha,
   } = useProgress({
     easing: Easing.out(Easing.ease),
-    duration: 300,
+    duration: 100,
     repeat: false,
     waitUntilRun: true,
   })
@@ -71,7 +71,7 @@ export const Playground = () => {
       <Canvas style={{ flex: 1, backgroundColor: '#339933' }}>
         <Path
           svg={svg}
-          strokeWidth={2}
+          strokeWidth={10}
           colorBreakpoints={colorBreakpoints}
           dst={rect(0, 150, 250, 250)}
           progressFront={progressFront}

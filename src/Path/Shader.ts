@@ -2,15 +2,16 @@ import { frag } from './ShaderLib'
 
 export const shaderSource = frag`
   uniform float u_totalLength;
-  uniform float u_points[400]; // 400 samples * 2 coordinates (x and y)
-  uniform float u_distances[200];
+  uniform float u_points[1000]; // 400 samples * 2 coordinates (x and y)
+  uniform float u_distances[500];
   uniform float u_searchThreshold;
   uniform int u_numBreakpoints;
   uniform float u_breakpoints[100]; // assuming max 10 breakpoints
-  uniform float u_colors[300]; // 10 breakpoints * 4 (rgba)
+  uniform float u_colors[300]; // 10 breakpoints * 3 (rgba)
   uniform float u_progress_front; // Add uniform for progress
   uniform float u_progress_back; // Add uniform for progress
   uniform float u_progress_alpha; // Add uniform for progress
+  uniform vec3 u_intersection; 
 
   float distanceSquared(vec2 p1, vec2 p2) {
     vec2 diff = p1 - p2;
@@ -21,7 +22,7 @@ export const shaderSource = frag`
     float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
     float bestDist = u_distances[0];
 
-    for (int i = 1; i < 200; i++) {
+    for (int i = 1; i < 500; i++) { // change here when sample points increase
       vec2 point = vec2(u_points[2 * i], u_points[2 * i + 1]);
       float distSq = distanceSquared(pos, point);
 
@@ -42,14 +43,19 @@ export const shaderSource = frag`
     return vec4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
   }
 
-  vec4 getColorForDistanceMix(float distanceAlongPath) {
-    if (distanceAlongPath > u_progress_front * u_totalLength) {
-      return vec4(0.0, 0.0, 0.0, 0.0); // Return transparent color
+  vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
+    if (distanceAlongPath > u_progress_front * u_totalLength || u_progress_front == 0.0) {
+      return vec4(0.0, 0.0, 0.0, 0.0); // Green for distance after front progress
     }
 
-    if (distanceAlongPath < u_progress_back * u_totalLength) {
-      return vec4(0.0, 0.0, 0.0, 0.0); // Return transparent color for back progress
+    if (distanceAlongPath < u_progress_back * u_totalLength || u_progress_back == 1.0) {
+      if(sqrt(distanceSquared(u_intersection.xy, pos)) <= 5 && u_progress_back * u_totalLength < u_intersection.z) {
+        distanceAlongPath = u_intersection.z;
+      }else{
+        return vec4(0.0, 0.0, 0.0, 0.0); 
+      }
     }
+
 
     for (int i = 0; i < 100; i++) {
       if (i >= u_numBreakpoints - 1 || distanceAlongPath < u_breakpoints[i + 1] * u_totalLength) {
@@ -65,11 +71,11 @@ export const shaderSource = frag`
         return applyAlphaToColor(mixedColor, u_progress_alpha);
       }
     }
-    return vec4(0.0); // Default color if no breakpoints are matched
+    return vec4(0.0);; // Default color if no breakpoints are matched
   }
 
   vec4 main(vec2 pos) {
     float distanceAlongPath = getClosestDistance(pos);
-    return getColorForDistanceMix(distanceAlongPath);
+    return getColorForDistanceMix(distanceAlongPath, pos);
   }
 `
