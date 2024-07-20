@@ -124,8 +124,8 @@ export const Path = ({
   dst: SkHostRect
   progressFront: SharedValue<number>
   progressBack: SharedValue<number>
-  alphaProgress: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
+  alphaProgress?: SharedValue<number>
 }) => {
   const preparedPath = useMemo(() => new PathGeometry(svg, dst), [svg])
 
@@ -202,7 +202,7 @@ export const Path = ({
     u_colors: colors,
     u_progress_front: progressFront.value,
     u_progress_back: progressBack.value,
-    u_progress_alpha: alphaProgress.value,
+    u_progress_alpha: alphaProgress?.value ?? 1,
     u_intersection: intersection,
     u_tangent_p1: tangentSegment.p1,
     u_tangent_p2: tangentSegment.p2,
