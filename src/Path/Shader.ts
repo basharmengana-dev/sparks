@@ -4,16 +4,20 @@ export const shaderSource = frag`
 uniform float u_totalLength;
 uniform float u_points[1000]; // 400 samples * 2 coordinates (x and y)
 uniform float u_distances[500];
+
 uniform float u_searchThreshold;
+
 uniform int u_numBreakpoints;
 uniform float u_breakpoints[100]; // assuming max 10 breakpoints
 uniform float u_colors[300]; // 10 breakpoints * 3 (rgba)
+
 uniform float u_progress_front; // Add uniform for progress
 uniform float u_progress_back; // Add uniform for progress
 uniform float u_progress_alpha; // Add uniform for progress
-uniform vec3 u_intersection;
-uniform vec2 u_tangent_p1;
-uniform vec2 u_tangent_p2;
+
+uniform float u_intersections[5]; // progress, p1 (x, y), p2 (x, y) 5 values times amount of intersections allowed
+
+
 uniform float u_strokeWidth;
 
 float distanceSquared(vec2 p1, vec2 p2) {
@@ -71,20 +75,20 @@ float getDistanceAlongLine(vec2 pos, vec2 A, vec2 B) {
 
 vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
   if (distanceAlongPath > u_progress_front * u_totalLength || u_progress_front == 0.0) {
-    return vec4(0.0, 0.0, 0.0, 0.0); // Green for distance after front progress
+    return vec4(0.0, 0.0, 0.0, 0.0);
   }
 
   if (distanceAlongPath < u_progress_back * u_totalLength || u_progress_back == 1.0) {
-    vec2 A = u_tangent_p1;
-    vec2 B = u_tangent_p2;
+    vec2 A = vec2(u_intersections[1], u_intersections[2]); 
+    vec2 B = vec2(u_intersections[3], u_intersections[4]); 
 
     if (
       isPointOnLineSegment(pos, A, B, u_strokeWidth)
-      && u_progress_front * u_totalLength + distance(A, B) > u_intersection.z + getDistanceAlongLine(pos, A, B)
+      && u_progress_front * u_totalLength + distance(A, B) > u_intersections[0] + getDistanceAlongLine(pos, A, B)
     ) {
-      if (u_intersection.z + getDistanceAlongLine(pos, A, B) >= u_progress_back * u_totalLength + distance(A, B))
+      if (u_intersections[0] + getDistanceAlongLine(pos, A, B) >= u_progress_back * u_totalLength + distance(A, B))
       {
-        distanceAlongPath = u_intersection.z;
+        distanceAlongPath = u_intersections[0];
       } else {
         return vec4(0.0, 0.0, 0.0, 0.0);
       }

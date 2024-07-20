@@ -1,26 +1,17 @@
 import { useMemo } from 'react'
 import {
   Path as SkiaPath,
-  rect,
   Shader,
   SkHostRect,
-  Circle,
-  Line,
-  Skia,
 } from '@shopify/react-native-skia'
-import { Dimensions } from 'react-native'
 import { PathGeometry } from './PathGeometry'
-import {
-  SharedValue,
-  useAnimatedReaction,
-  useDerivedValue,
-} from 'react-native-reanimated'
+import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 
-function findPathIntersectionWithDistance(
+const findPathIntersectionWithDistance = (
   points: Float32Array,
   distances: Float32Array,
-): Float32Array {
+): Float32Array => {
   const n = points.length / 2
   let minDistance = Infinity
 
@@ -47,11 +38,11 @@ function findPathIntersectionWithDistance(
   return intersection
 }
 
-function findTangentSegment(
+const findTangent = (
   points: Float32Array,
   intersection: Float32Array,
   strokeWidth: number,
-) {
+) => {
   const intersectionX = intersection[0]
   const intersectionY = intersection[1]
   let minDistance = Infinity
@@ -86,7 +77,7 @@ function findTangentSegment(
   const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
   const normalizeDirection = [direction[0] / length, direction[1] / length]
 
-  const expansionFactor = strokeWidth / 2
+  const expansionFactor = strokeWidth / 1.5
   const extendedP1 = [
     intersection[0] - normalizeDirection[0] * length * expansionFactor,
     intersection[1] - normalizeDirection[1] * length * expansionFactor,
@@ -97,6 +88,17 @@ function findTangentSegment(
   ]
 
   return { p1: extendedP1, p2: extendedP2 }
+}
+
+const findIntersections = (
+  points: Float32Array,
+  distances: Float32Array,
+  strokeWidth: number,
+) => {
+  const intersection = findPathIntersectionWithDistance(points, distances)
+  const tangent = findTangent(points, intersection, strokeWidth)
+
+  return [intersection[2], ...tangent.p1, ...tangent.p2]
 }
 
 export const Path = ({
@@ -127,8 +129,7 @@ export const Path = ({
     breakpoints,
     numBreakpoints,
     pathSVG,
-    intersection,
-    tangentSegment,
+    intersections,
   } = useMemo(() => {
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
@@ -161,8 +162,7 @@ export const Path = ({
       colors[index * 4 + 2] = bp.color[2]
     })
 
-    const intersection = findPathIntersectionWithDistance(points, distances)
-    const tangentSegment = findTangentSegment(points, intersection, strokeWidth)
+    const intersections = findIntersections(points, distances, strokeWidth)
 
     return {
       flattenedPoints,
@@ -173,8 +173,7 @@ export const Path = ({
       breakpoints,
       numBreakpoints: colorBreakpoints.length,
       pathSVG,
-      intersection,
-      tangentSegment,
+      intersections,
     }
   }, [preparedPath])
 
@@ -189,9 +188,7 @@ export const Path = ({
     u_progress_front: progressFront.value,
     u_progress_back: progressBack.value,
     u_progress_alpha: alphaProgress?.value ?? 1,
-    u_intersection: intersection,
-    u_tangent_p1: tangentSegment.p1,
-    u_tangent_p2: tangentSegment.p2,
+    u_intersections: intersections,
     u_strokeWidth: strokeWidth,
   }))
 

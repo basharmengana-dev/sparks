@@ -60,7 +60,7 @@ export const Playground = () => {
       <Canvas style={{ flex: 1, backgroundColor: '#339933' }}>
         <Path
           svg={svg}
-          strokeWidth={3}
+          strokeWidth={10}
           colorBreakpoints={colorBreakpoints}
           dst={rect(0, 150, 250, 250)}
           progressFront={progressFront}
