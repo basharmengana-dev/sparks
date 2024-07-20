@@ -12,11 +12,27 @@ export const shaderSource = frag`
   uniform float u_progress_back; // Add uniform for progress
   uniform float u_progress_alpha; // Add uniform for progress
   uniform vec3 u_intersection; 
+  uniform vec2 u_tangent_p1;
+  uniform vec2 u_tangent_p2;
+  uniform float u_strokeWidth;
 
   float distanceSquared(vec2 p1, vec2 p2) {
     vec2 diff = p1 - p2;
     return dot(diff, diff);
   }
+
+
+float signedDistanceToLineSegment(vec2 p, vec2 a, vec2 b )
+{
+    vec2 pa = p-a, ba = b-a;
+    float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+    return length( pa - ba*h );
+}
+
+bool isPointOnLineSegment(vec2 pos, vec2 A, vec2 B, float strokeWidth) {
+    float distance = signedDistanceToLineSegment(pos, A, B);
+    return distance < strokeWidth/2;
+}
 
   float getClosestDistance(vec2 pos) {
     float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
@@ -49,12 +65,16 @@ export const shaderSource = frag`
     }
 
     if (distanceAlongPath < u_progress_back * u_totalLength || u_progress_back == 1.0) {
-      if(sqrt(distanceSquared(u_intersection.xy, pos)) <= 5 && u_progress_back * u_totalLength < u_intersection.z) {
-        distanceAlongPath = u_intersection.z;
-      }else{
-        return vec4(0.0, 0.0, 0.0, 0.0); 
+      vec2 A = u_tangent_p1;
+      vec2 B = u_tangent_p2;
+    
+      if (isPointOnLineSegment(pos, A, B, u_strokeWidth) && u_progress_back * u_totalLength < u_intersection.z) {
+        distanceAlongPath = u_intersection.z;// Transparent for points in the intersection condition
+      } else {
+        return vec4(0.0, 0.0, 0.0, 0.0); // Red for debugging points not in the intersection condition
       }
     }
+
 
 
     for (int i = 0; i < 100; i++) {
@@ -71,7 +91,7 @@ export const shaderSource = frag`
         return applyAlphaToColor(mixedColor, u_progress_alpha);
       }
     }
-    return vec4(0.0);; // Default color if no breakpoints are matched
+    return vec4(0.0); // Default color if no breakpoints are matched
   }
 
   vec4 main(vec2 pos) {

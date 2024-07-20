@@ -5,6 +5,8 @@ import {
   Shader,
   SkHostRect,
   Circle,
+  Line,
+  Skia,
 } from '@shopify/react-native-skia'
 import { Dimensions } from 'react-native'
 import { PathGeometry } from './PathGeometry'
@@ -41,6 +43,48 @@ function findClosestDistance(
   return intersection
 }
 
+function findTangentSegment(
+  points: Float32Array,
+  intersection: Float32Array,
+): { p1: [number, number]; p2: [number, number] } {
+  const intersectionX = intersection[0]
+  const intersectionY = intersection[1]
+  let minDistance = Infinity
+  let closestIndex = -1
+
+  // Find the closest point in the array to the intersection point
+  for (let i = 0; i < points.length / 2; i++) {
+    const x = points[2 * i]
+    const y = points[2 * i + 1]
+    const distance = Math.sqrt(
+      Math.pow(intersectionX - x, 2) + Math.pow(intersectionY - y, 2),
+    )
+
+    if (distance < minDistance) {
+      minDistance = distance
+      closestIndex = i
+    }
+  }
+
+  // Determine the points that form the tangent segment
+  let p1: [number, number], p2: [number, number]
+  if (closestIndex === 0) {
+    // If the closest point is the first point, the segment is between the first and second points
+    p1 = [points[0], points[1]]
+    p2 = [points[2], points[3]]
+  } else if (closestIndex === points.length / 2 - 1) {
+    // If the closest point is the last point, the segment is between the last and second to last points
+    p1 = [points[2 * (closestIndex - 1)], points[2 * (closestIndex - 1) + 1]]
+    p2 = [points[2 * closestIndex], points[2 * closestIndex + 1]]
+  } else {
+    // Otherwise, the segment is between the closest point and the next point
+    p1 = [points[2 * closestIndex], points[2 * closestIndex + 1]]
+    p2 = [points[2 * (closestIndex + 1)], points[2 * (closestIndex + 1) + 1]]
+  }
+
+  return { p1, p2 }
+}
+
 export const Path = ({
   svg,
   strokeWidth,
@@ -70,6 +114,7 @@ export const Path = ({
     numBreakpoints,
     pathSVG,
     intersection,
+    tangentSegment,
   } = useMemo(() => {
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
@@ -103,7 +148,38 @@ export const Path = ({
       colors[index * 4 + 2] = bp.color[2]
     })
     const intersection = findClosestDistance(points, distances)
-    console.log('IntS: ', intersection, totalLength)
+
+    // Example usage within Path component
+    const tangentSegment = findTangentSegment(points, intersection)
+    console.log('Tangent segment:', tangentSegment)
+
+    // Calculate the direction vector
+    const direction = [
+      tangentSegment.p2[0] - tangentSegment.p1[0],
+      tangentSegment.p2[1] - tangentSegment.p1[1],
+    ]
+
+    // Calculate the length of the direction vector
+    const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
+
+    // Normalize the direction vector
+    const unitDirection = [direction[0] / length, direction[1] / length]
+
+    // Extend the line segment by a factor in both directions
+    const factor = strokeWidth / 1.5 // Change this factor to make the line longer or shorter
+    const extendedP1 = [
+      intersection[0] - unitDirection[0] * length * factor,
+      intersection[1] - unitDirection[1] * length * factor,
+    ]
+    const extendedP2 = [
+      intersection[0] + unitDirection[0] * length * factor,
+      intersection[1] + unitDirection[1] * length * factor,
+    ]
+
+    // Create the path
+    const path = Skia.Path.Make()
+    path.moveTo(extendedP1[0], extendedP1[1])
+    path.lineTo(extendedP2[0], extendedP2[1])
 
     return {
       flattenedPoints,
@@ -115,6 +191,7 @@ export const Path = ({
       numBreakpoints: colorBreakpoints.length,
       pathSVG,
       intersection,
+      tangentSegment: { p1: extendedP1, p2: extendedP2 },
     }
   }, [preparedPath])
 
@@ -130,6 +207,9 @@ export const Path = ({
     u_progress_back: progressBack.value,
     u_progress_alpha: alphaProgress.value,
     u_intersection: intersection,
+    u_tangent_p1: tangentSegment.p1,
+    u_tangent_p2: tangentSegment.p2,
+    u_strokeWidth: strokeWidth,
   }))
 
   return (
@@ -141,6 +221,7 @@ export const Path = ({
         strokeCap="round">
         <Shader source={shaderSource} uniforms={uniforms} />
       </SkiaPath>
+      {/* <SkiaPath path={path} color="black" strokeWidth={2} style={'stroke'} /> */}
       {/* <Circle cx={intersection[0]} cy={intersection[1]} r={1} color={'red'} /> */}
     </>
   )
