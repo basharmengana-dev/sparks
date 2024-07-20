@@ -10,7 +10,11 @@ import {
 } from '@shopify/react-native-skia'
 import { Dimensions } from 'react-native'
 import { PathGeometry } from './PathGeometry'
-import { SharedValue, useDerivedValue } from 'react-native-reanimated'
+import {
+  SharedValue,
+  useAnimatedReaction,
+  useDerivedValue,
+} from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 
 function findClosestDistance(
@@ -46,7 +50,8 @@ function findClosestDistance(
 function findTangentSegment(
   points: Float32Array,
   intersection: Float32Array,
-): { p1: [number, number]; p2: [number, number] } {
+  strokeWidth: number,
+) {
   const intersectionX = intersection[0]
   const intersectionY = intersection[1]
   let minDistance = Infinity
@@ -82,7 +87,27 @@ function findTangentSegment(
     p2 = [points[2 * (closestIndex + 1)], points[2 * (closestIndex + 1) + 1]]
   }
 
-  return { p1, p2 }
+  // Calculate the direction vector
+  const direction = [p2[0] - p1[0], p2[1] - p1[1]]
+
+  // Calculate the length of the direction vector
+  const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
+
+  // Normalize the direction vector
+  const unitDirection = [direction[0] / length, direction[1] / length]
+
+  // Extend the line segment by a factor in both directions
+  const factor = strokeWidth / 2 // Change this factor to make the line longer or shorter
+  const extendedP1 = [
+    intersection[0] - unitDirection[0] * length * factor,
+    intersection[1] - unitDirection[1] * length * factor,
+  ]
+  const extendedP2 = [
+    intersection[0] + unitDirection[0] * length * factor,
+    intersection[1] + unitDirection[1] * length * factor,
+  ]
+
+  return { p1: extendedP1, p2: extendedP2 }
 }
 
 export const Path = ({
@@ -148,39 +173,11 @@ export const Path = ({
       colors[index * 4 + 2] = bp.color[2]
     })
     const intersection = findClosestDistance(points, distances)
-
+    console.log('intersection', intersection)
     // Example usage within Path component
-    const tangentSegment = findTangentSegment(points, intersection)
-    console.log('Tangent segment:', tangentSegment)
-
-    // Calculate the direction vector
-    const direction = [
-      tangentSegment.p2[0] - tangentSegment.p1[0],
-      tangentSegment.p2[1] - tangentSegment.p1[1],
-    ]
-
-    // Calculate the length of the direction vector
-    const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
-
-    // Normalize the direction vector
-    const unitDirection = [direction[0] / length, direction[1] / length]
-
-    // Extend the line segment by a factor in both directions
-    const factor = strokeWidth / 1.5 // Change this factor to make the line longer or shorter
-    const extendedP1 = [
-      intersection[0] - unitDirection[0] * length * factor,
-      intersection[1] - unitDirection[1] * length * factor,
-    ]
-    const extendedP2 = [
-      intersection[0] + unitDirection[0] * length * factor,
-      intersection[1] + unitDirection[1] * length * factor,
-    ]
+    const tangentSegment = findTangentSegment(points, intersection, strokeWidth)
 
     // Create the path
-    const path = Skia.Path.Make()
-    path.moveTo(extendedP1[0], extendedP1[1])
-    path.lineTo(extendedP2[0], extendedP2[1])
-
     return {
       flattenedPoints,
       flattenedDistances,
@@ -191,7 +188,7 @@ export const Path = ({
       numBreakpoints: colorBreakpoints.length,
       pathSVG,
       intersection,
-      tangentSegment: { p1: extendedP1, p2: extendedP2 },
+      tangentSegment,
     }
   }, [preparedPath])
 

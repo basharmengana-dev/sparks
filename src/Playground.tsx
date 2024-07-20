@@ -41,7 +41,7 @@ export const Playground = () => {
     run: runFront,
   } = useProgress({
     easing: Easing.out(Easing.ease),
-    duration: 500,
+    duration: 1500,
   })
 
   const {
@@ -51,7 +51,7 @@ export const Playground = () => {
   } = useProgress({
     to: 0,
     easing: Easing.out(Easing.ease),
-    duration: 5000,
+    duration: 2000,
   })
 
   const {
@@ -71,7 +71,7 @@ export const Playground = () => {
       <Canvas style={{ flex: 1, backgroundColor: '#339933' }}>
         <Path
           svg={svg}
-          strokeWidth={10}
+          strokeWidth={3}
           colorBreakpoints={colorBreakpoints}
           dst={rect(0, 150, 250, 250)}
           progressFront={progressFront}
