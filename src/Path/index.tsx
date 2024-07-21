@@ -8,132 +8,6 @@ import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 
-const findPathIntersectionWithDistance = (
-  points: Float32Array,
-  distances: Float32Array,
-): Float32Array => {
-  const n = points.length / 2
-  let minDistance = Infinity
-
-  const intersection = new Float32Array(3)
-
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const x1 = points[2 * i]
-      const y1 = points[2 * i + 1]
-      const x2 = points[2 * j]
-      const y2 = points[2 * j + 1]
-
-      const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2))
-
-      if (distance < minDistance) {
-        minDistance = distance
-        intersection[0] = x2
-        intersection[1] = y2
-        intersection[2] = distances[j]
-      }
-    }
-  }
-
-  return intersection
-}
-
-const findTangent = (
-  points: Float32Array,
-  intersection: Float32Array,
-  strokeWidth: number,
-) => {
-  const intersectionX = intersection[0]
-  const intersectionY = intersection[1]
-  let minDistance = Infinity
-  let closestIndex = -1
-
-  for (let i = 0; i < points.length / 2; i++) {
-    const x = points[2 * i]
-    const y = points[2 * i + 1]
-    const distance = Math.sqrt(
-      Math.pow(intersectionX - x, 2) + Math.pow(intersectionY - y, 2),
-    )
-
-    if (distance < minDistance && distance < 0.1) {
-      minDistance = distance
-      closestIndex = i
-    }
-  }
-
-  let p1: [number, number], p2: [number, number]
-  if (closestIndex === 0) {
-    p1 = [points[0], points[1]]
-    p2 = [points[2], points[3]]
-  } else if (closestIndex === points.length / 2 - 1) {
-    p1 = [points[2 * (closestIndex - 1)], points[2 * (closestIndex - 1) + 1]]
-    p2 = [points[2 * closestIndex], points[2 * closestIndex + 1]]
-  } else {
-    p1 = [points[2 * closestIndex], points[2 * closestIndex + 1]]
-    p2 = [points[2 * (closestIndex + 1)], points[2 * (closestIndex + 1) + 1]]
-  }
-
-  const direction = [p2[0] - p1[0], p2[1] - p1[1]]
-  const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
-  const normalizeDirection = [direction[0] / length, direction[1] / length]
-
-  const expansionFactor = strokeWidth / 2
-  const extendedP1 = [
-    intersection[0] - normalizeDirection[0] * length * expansionFactor,
-    intersection[1] - normalizeDirection[1] * length * expansionFactor,
-  ]
-  const extendedP2 = [
-    intersection[0] + normalizeDirection[0] * length * expansionFactor,
-    intersection[1] + normalizeDirection[1] * length * expansionFactor,
-  ]
-
-  return { p1: extendedP1, p2: extendedP2 }
-}
-
-const findIntersections = (
-  points: Float32Array,
-  distances: Float32Array,
-  strokeWidth: number,
-  expectedIntersections: number = 10,
-) => {
-  const intersections = []
-
-  // Clone the points and distances arrays to avoid mutating the originals
-  let currentPoints = points.slice()
-  let currentDistances = distances.slice()
-
-  for (let k = 0; k < expectedIntersections; k++) {
-    if (currentPoints.length < 4) break // Need at least 2 points to form an intersection
-
-    const intersection = findPathIntersectionWithDistance(
-      currentPoints,
-      currentDistances,
-    )
-
-    if (intersection[2] === Infinity) break // No more intersections
-
-    const tangent = findTangent(currentPoints, intersection, strokeWidth)
-    intersections.push([intersection[2], ...tangent.p1, ...tangent.p2])
-
-    // Remove the points that were part of the intersection
-    const newPoints = []
-    const newDistances = []
-    for (let i = 0; i < currentPoints.length / 2; i++) {
-      const x = currentPoints[2 * i]
-      const y = currentPoints[2 * i + 1]
-      if (x !== intersection[0] || y !== intersection[1]) {
-        newPoints.push(x, y)
-        newDistances.push(currentDistances[i])
-      }
-    }
-
-    currentPoints = new Float32Array(newPoints)
-    currentDistances = new Float32Array(newDistances)
-  }
-
-  return intersections.flat()
-}
-
 export const Path = ({
   svg,
   strokeWidth,
@@ -195,7 +69,12 @@ export const Path = ({
       colors[index * 4 + 2] = bp.color[2]
     })
 
-    const intersections = findIntersections(points, distances, strokeWidth, 2)
+    const intersections = preparedPath.findIntersections(
+      points,
+      distances,
+      strokeWidth,
+      2,
+    )
 
     return {
       flattenedPoints,
