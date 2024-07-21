@@ -6,6 +6,7 @@ import { shaderSource } from './Shader'
 
 export const Path = ({
   svg,
+  maxIntersectionsAllowed,
   strokeWidth,
   origin,
   size,
@@ -15,6 +16,7 @@ export const Path = ({
   colorBreakpoints,
 }: {
   svg: string
+  maxIntersectionsAllowed: number
   strokeWidth: number
   origin: SkPoint
   size: SkPoint
@@ -56,7 +58,7 @@ export const Path = ({
     const searchThreshold = Math.floor(strokeWidth / 2) + 0.5
 
     const numMaxBreakpoints = 100
-    const numMaxColors = numMaxBreakpoints * 3
+    const numMaxColors = numMaxBreakpoints * 4
     const breakpoints = new Array(numMaxBreakpoints).fill(0)
     const colors = new Array(numMaxColors).fill(0)
 
@@ -65,13 +67,14 @@ export const Path = ({
       colors[index * 4] = bp.color[0]
       colors[index * 4 + 1] = bp.color[1]
       colors[index * 4 + 2] = bp.color[2]
+      colors[index * 4 + 3] = bp.color[3]
     })
 
     const intersections = preparedPath.findIntersections(
       points,
       distances,
       strokeWidth,
-      2,
+      maxIntersectionsAllowed,
     )
 
     return {

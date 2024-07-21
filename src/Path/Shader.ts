@@ -9,7 +9,7 @@ uniform float u_searchThreshold;
 
 uniform int u_numBreakpoints;
 uniform float u_breakpoints[100]; // assuming max 10 breakpoints
-uniform float u_colors[300]; // 10 breakpoints * 3 (rgba)
+uniform float u_colors[400]; // 10 breakpoints * 4 (rgba)
 
 uniform float u_progress_front; // Add uniform for progress
 uniform float u_progress_back; // Add uniform for progress
@@ -78,10 +78,10 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
     return vec4(0.0, 0.0, 0.0, 0.0);
   }
 
-  vec4 color = vec4(-1);
+  bool returnTransparent = false;
   if (distanceAlongPath < u_progress_back * u_totalLength || u_progress_back == 1.0) {
     for (int i = 0; i <= 1; i++) {
-      color = vec4(-1);
+      returnTransparent = false;
       float intersectionDistance = u_intersections[i * 5];
       vec2 A = vec2(u_intersections[1 + i * 5], u_intersections[2 + i * 5]);
       vec2 B = vec2(u_intersections[3 + i * 5], u_intersections[4 + i * 5]);
@@ -95,16 +95,16 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
           distanceAlongPath = intersectionDistance;
           break;
         } else {
-          color = vec4(0.0, 0.0, 0.0, 0.0); // return
+          returnTransparent = true;
         }
       } else {
-        color = vec4(0.0, 0.0, 0.0, 0.0); // return
+        returnTransparent = true;
       }
     }
   }
 
-  if(color.a != -1) {
-    return color;
+  if(returnTransparent) {
+    return vec4(0.0, 0.0, 0.0, 0.0); ;
   }
 
   for (int i = 0; i < 100; i++) {
