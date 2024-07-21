@@ -1,13 +1,8 @@
 import { Path } from '../Path'
-import { rect, SkPoint } from '@shopify/react-native-skia'
-import { useState } from 'react'
+import { SkPoint } from '@shopify/react-native-skia'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { Dimensions } from 'react-native'
-import {
-  Easing,
-  SharedValue,
-  useAnimatedReaction,
-  useSharedValue,
-} from 'react-native-reanimated'
+import { Easing, SharedValue, useSharedValue } from 'react-native-reanimated'
 import { useProgress } from '../Animations/useProgress'
 
 const svg =
@@ -21,62 +16,80 @@ const colorBreakpoints = [
 ]
 const { width, height } = Dimensions.get('window')
 
-export const Tail = ({
-  progressOrchestration,
-  bottomPadding = 0,
-}: {
-  progressOrchestration: SharedValue<number>
-  bottomPadding?: number
-}) => {
-  const startAtValue = useSharedValue(0.5)
-
-  const {
-    progress: progressFront,
-    pause: pauseFront,
-    run: runFront,
-  } = useProgress({
-    easing: Easing.out(Easing.ease),
-    duration: 1500,
-    waitUntilProgress: {
-      progress: progressOrchestration,
-      isValue: startAtValue,
-    },
-    waitUntilRun: false,
-  })
-
-  useAnimatedReaction(
-    () => progressFront.value,
-    value => {
-      console.log('progressFront ', value)
-    },
-  )
-
-  const {
-    progress: progressBack,
-    reset: resetBack,
-    pause: pauseBack,
-    run: runBack,
-  } = useProgress({
-    to: 0,
-    easing: Easing.out(Easing.ease),
-    duration: 2000,
-  })
-
-  const [origin, _setOrigin] = useState<SkPoint>({
-    x: width / 2,
-    y: height - bottomPadding,
-  })
-  const [size, _setSize] = useState<SkPoint>({ x: 250, y: 250 })
-
-  return (
-    <Path
-      svg={svg}
-      strokeWidth={3}
-      colorBreakpoints={colorBreakpoints}
-      origin={origin}
-      size={size}
-      progressFront={progressFront}
-      progressBack={progressBack}
-    />
-  )
+export interface TailRef {
+  readyToRun: () => void
 }
+interface TailProps {
+  progressOrchestration: SharedValue<number>
+  isPaused: boolean
+  bottomPadding?: number
+}
+
+export const Tail = forwardRef<TailRef, TailProps>(
+  ({ progressOrchestration, bottomPadding = 0, isPaused }, ref) => {
+    const startFrontAtValue = useSharedValue(0)
+    const startBackAtValue = useSharedValue(0.5)
+
+    const {
+      progress: progressFront,
+      pause: pauseFront,
+      readyToRun: readyToRunFront,
+    } = useProgress({
+      to: 1,
+      from: 0,
+      easing: Easing.out(Easing.ease),
+      duration: 1500,
+      waitUntilProgress: {
+        progress: progressOrchestration,
+        isValue: startFrontAtValue,
+      },
+      waitUntilRun: false,
+    })
+
+    const {
+      progress: progressBack,
+      pause: pauseBack,
+      readyToRun: readyToRunBack,
+    } = useProgress({
+      to: 1,
+      from: 0,
+      easing: Easing.out(Easing.ease),
+      duration: 2000,
+      waitUntilProgress: {
+        progress: progressOrchestration,
+        isValue: startBackAtValue,
+      },
+      waitUntilRun: false,
+    })
+
+    const [origin, _setOrigin] = useState<SkPoint>({
+      x: width / 2,
+      y: height - bottomPadding,
+    })
+    const [size, _setSize] = useState<SkPoint>({ x: 250, y: 250 })
+
+    useEffect(() => {
+      pauseFront(isPaused)
+      pauseBack(isPaused)
+    }, [isPaused])
+
+    useImperativeHandle(ref, () => ({
+      readyToRun() {
+        readyToRunBack()
+        readyToRunFront()
+      },
+    }))
+
+    return (
+      <Path
+        svg={svg}
+        strokeWidth={3}
+        colorBreakpoints={colorBreakpoints}
+        origin={origin}
+        size={size}
+        progressFront={progressFront}
+        progressBack={progressBack}
+      />
+    )
+  },
+)

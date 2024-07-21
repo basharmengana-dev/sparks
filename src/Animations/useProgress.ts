@@ -10,14 +10,16 @@ import {
 export const useProgress = ({
   duration,
   easing,
-  to = 1,
+  to,
+  from,
   repeat = false,
   waitUntilRun = true,
   waitUntilProgress = null,
 }: {
   duration: number
   easing: EasingFunction
-  to?: number
+  to: number
+  from: number
   repeat?: boolean
   waitUntilRun?: boolean
   waitUntilProgress?: {
@@ -52,7 +54,7 @@ export const useProgress = ({
       }
     },
     {
-      progress: 0,
+      progress: from,
     },
   )
   const {
@@ -62,25 +64,14 @@ export const useProgress = ({
 
   return {
     progress,
-    pause: () => {
-      pause.value = !pause.value
+    pause: (pauseState: boolean) => {
+      pause.value = pauseState
     },
-    run: () => {
+    readyToRun: () => {
       runOnUI(initializeGenerator)()
-      toValue.value = 1
-      progress.value = 0
+      toValue.value = to
+      progress.value = from
       run.value = true
-    },
-    runInverse: () => {
-      runOnUI(initializeGenerator)()
-      toValue.value = 0
-      progress.value = 1
-      run.value = true
-    },
-    reset: () => {
-      runOnUI(initializeGenerator)()
-      run.value = !waitUntilRun
-      progress.value = to
     },
   }
 }

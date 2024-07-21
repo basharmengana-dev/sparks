@@ -1,32 +1,33 @@
 import { Button, View } from 'react-native'
 import { useProgress } from '../Animations/useProgress'
-import { Tail } from './tail'
+import { Tail, TailRef } from './tail'
 import { Canvas } from '@shopify/react-native-skia'
 import { Easing, useAnimatedReaction } from 'react-native-reanimated'
+import { useRef, useState } from 'react'
 
 export const FireworkOrchestrator = () => {
+  const [isPaused, setIsPaused] = useState(false)
+  const tailRef = useRef<TailRef>(null)
+
   const {
     progress: progressOrchestration,
     pause: pauseOrchestration,
-    run: runOrchestration,
+    readyToRun: runOrchestration,
   } = useProgress({
+    to: 1,
+    from: 0,
     easing: Easing.out(Easing.ease),
     duration: 1500,
   })
-
-  useAnimatedReaction(
-    () => progressOrchestration.value,
-    value => {
-      console.log('progressOrchestration ', value)
-    },
-  )
 
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
         <Tail
           progressOrchestration={progressOrchestration}
+          isPaused={isPaused}
           bottomPadding={120}
+          ref={tailRef}
         />
       </Canvas>
       <View
@@ -44,34 +45,15 @@ export const FireworkOrchestrator = () => {
         <Button
           title={'⏸️'}
           onPress={() => {
-            // pauseFront()
-            // pauseBack()
-          }}
-          color={'white'}
-        />
-        <Button
-          title={'▶️'}
-          onPress={() => {
-            // resetBack()
-            runOrchestration()
-          }}
-          color={'white'}
-        />
-        <Button
-          title={'◀️'}
-          onPress={() => {
-            // runBack()
+            setIsPaused(!isPaused)
           }}
           color={'white'}
         />
         <Button
           title={'🎊'}
           onPress={() => {
-            // resetBack()
-            // runFront()
-            // setTimeout(() => {
-            //   runOnJS(runBack)()
-            // }, 200)
+            tailRef.current?.readyToRun()
+            runOrchestration()
           }}
           color={'white'}
         />
