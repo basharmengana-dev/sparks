@@ -2,29 +2,92 @@ import type {
   SkContourMeasure,
   SkHostRect,
   SkPath,
+  SkPoint,
   SkRect,
+  Vector,
 } from '@shopify/react-native-skia'
-import { fitbox, processTransform2d, Skia } from '@shopify/react-native-skia'
+import {
+  fitbox,
+  processTransform2d,
+  rect,
+  Skia,
+} from '@shopify/react-native-skia'
 
 const fitRect = (src: SkRect, dst: SkRect) =>
   processTransform2d(fitbox('contain', src, dst))
+
+interface Point {
+  x: number
+  y: number
+}
+function getPointsFromPath(path: SkPath): Point[] {
+  const points: Point[] = []
+  const pathData = path.toSVGString()
+  const commands = pathData.match(/[a-df-z][^a-df-z]*/gi)
+
+  if (!commands) return points
+
+  for (const command of commands) {
+    const values = command
+      .slice(1)
+      .trim()
+      .split(/[\s,]+/)
+      .map(parseFloat)
+    for (let i = 0; i < values.length; i += 2) {
+      points.push({ x: values[i], y: values[i + 1] })
+    }
+  }
+
+  return points
+}
+
+function findBottommostPoint(points: Point[]): Point {
+  return points.reduce(
+    (bottommost, point) => (point.y > bottommost.y ? point : bottommost),
+    points[0],
+  )
+}
+
+function translateSkPathToPosition(
+  path: SkPath,
+  targetX: number,
+  targetY: number,
+): SkPath {
+  const points = getPointsFromPath(path)
+  if (!points.length) return path
+
+  const bottommostPoint = findBottommostPoint(points)
+  const dx = targetX - bottommostPoint.x
+  const dy = targetY - bottommostPoint.y
+
+  const matrix = Skia.Matrix()
+  matrix.translate(dx, dy)
+
+  const transformedPath = Skia.Path.Make()
+  transformedPath.addPath(path, matrix)
+
+  return transformedPath
+}
 
 export class PathGeometry {
   private totalLength = 0
   private contour: SkContourMeasure
   public path: SkPath
 
-  constructor(svg: string, dst: SkHostRect) {
-    const path = Skia.Path.MakeFromSVGString(svg)!
+  constructor(svg: string, origin: SkPoint, size: SkPoint) {
+    let path = Skia.Path.MakeFromSVGString(svg)!
     const src = path.computeTightBounds()
-    const m3 = fitRect(src, dst)
+    const m3 = fitRect(src, rect(0, 0, size.x, size.y))
+
     path.transform(m3)
+    path = translateSkPathToPosition(path, origin.x, origin.y)
 
     const it = Skia.ContourMeasureIter(path, false, 1)
     const contour: SkContourMeasure = it.next()!
 
     this.totalLength = contour.length()
     this.contour = contour
+
     this.path = path
   }
 

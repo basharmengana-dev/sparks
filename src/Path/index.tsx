@@ -1,9 +1,5 @@
 import { useMemo } from 'react'
-import {
-  Path as SkiaPath,
-  Shader,
-  SkHostRect,
-} from '@shopify/react-native-skia'
+import { Path as SkiaPath, Shader, SkPoint } from '@shopify/react-native-skia'
 import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
@@ -11,7 +7,8 @@ import { shaderSource } from './Shader'
 export const Path = ({
   svg,
   strokeWidth,
-  dst,
+  origin,
+  size,
   progressFront,
   progressBack,
   alphaProgress,
@@ -19,13 +16,14 @@ export const Path = ({
 }: {
   svg: string
   strokeWidth: number
-  dst: SkHostRect
+  origin: SkPoint
+  size: SkPoint
   progressFront: SharedValue<number>
   progressBack: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
   alphaProgress?: SharedValue<number>
 }) => {
-  const preparedPath = useMemo(() => new PathGeometry(svg, dst), [svg])
+  const preparedPath = useMemo(() => new PathGeometry(svg, origin, size), [svg])
 
   const {
     flattenedPoints,
