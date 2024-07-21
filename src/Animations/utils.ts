@@ -15,7 +15,7 @@ export function* timeSincePreviousFrame() {
   return time
 }
 
-type EasingFunction = (value: number) => number
+export type EasingFunction = (value: number) => number
 interface TimingConfig {
   to: number
   easing: EasingFunction
@@ -43,6 +43,19 @@ type AnimationState = Record<string, unknown>
 type Animation<S extends AnimationState> = {
   animation: (state: AnimationValues<S>) => Generator
   state: S
+}
+
+export function* waitUntil({
+  value,
+  isValue,
+}: {
+  value: SharedValue<number>
+  isValue: SharedValue<number>
+}) {
+  'worklet'
+  while (value.value <= isValue.value) {
+    yield
+  }
 }
 
 export const makeAnimation = <S extends AnimationState>(

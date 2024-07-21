@@ -1,34 +1,33 @@
 import { Button, View } from 'react-native'
 import { useProgress } from '../Animations/useProgress'
 import { Tail } from './tail'
-import { Canvas, rect } from '@shopify/react-native-skia'
-import { Easing, runOnJS } from 'react-native-reanimated'
+import { Canvas } from '@shopify/react-native-skia'
+import { Easing, useAnimatedReaction } from 'react-native-reanimated'
 
 export const FireworkOrchestrator = () => {
   const {
-    progress: progressFront,
-    pause: pauseFront,
-    run: runFront,
+    progress: progressOrchestration,
+    pause: pauseOrchestration,
+    run: runOrchestration,
   } = useProgress({
     easing: Easing.out(Easing.ease),
     duration: 1500,
   })
 
-  const {
-    progress: progressBack,
-    reset: resetBack,
-    pause: pauseBack,
-    run: runBack,
-  } = useProgress({
-    to: 0,
-    easing: Easing.out(Easing.ease),
-    duration: 2000,
-  })
+  useAnimatedReaction(
+    () => progressOrchestration.value,
+    value => {
+      console.log('progressOrchestration ', value)
+    },
+  )
 
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
-        <Tail progressFront={progressFront} progressBack={progressBack} />
+        <Tail
+          progressOrchestration={progressOrchestration}
+          bottomPadding={120}
+        />
       </Canvas>
       <View
         style={{
@@ -45,34 +44,34 @@ export const FireworkOrchestrator = () => {
         <Button
           title={'⏸️'}
           onPress={() => {
-            pauseFront()
-            pauseBack()
+            // pauseFront()
+            // pauseBack()
           }}
           color={'white'}
         />
         <Button
           title={'▶️'}
           onPress={() => {
-            resetBack()
-            runFront()
+            // resetBack()
+            runOrchestration()
           }}
           color={'white'}
         />
         <Button
           title={'◀️'}
           onPress={() => {
-            runBack()
+            // runBack()
           }}
           color={'white'}
         />
         <Button
           title={'🎊'}
           onPress={() => {
-            resetBack()
-            runFront()
-            setTimeout(() => {
-              runOnJS(runBack)()
-            }, 200)
+            // resetBack()
+            // runFront()
+            // setTimeout(() => {
+            //   runOnJS(runBack)()
+            // }, 200)
           }}
           color={'white'}
         />

@@ -2,7 +2,13 @@ import { Path } from '../Path'
 import { rect, SkPoint } from '@shopify/react-native-skia'
 import { useState } from 'react'
 import { Dimensions } from 'react-native'
-import { SharedValue, useSharedValue } from 'react-native-reanimated'
+import {
+  Easing,
+  SharedValue,
+  useAnimatedReaction,
+  useSharedValue,
+} from 'react-native-reanimated'
+import { useProgress } from '../Animations/useProgress'
 
 const svg =
   'M 37.5 403.5 C 37.47 403.49 13.36 298.54 11.94 247.48 C 12.65 204.93 51 159 54 124 C 56 80 41.73 56.72 31.5 10.5'
@@ -16,13 +22,50 @@ const colorBreakpoints = [
 const { width, height } = Dimensions.get('window')
 
 export const Tail = ({
-  progressFront,
-  progressBack,
+  progressOrchestration,
+  bottomPadding = 0,
 }: {
-  progressFront: SharedValue<number>
-  progressBack: SharedValue<number>
+  progressOrchestration: SharedValue<number>
+  bottomPadding?: number
 }) => {
-  const [origin, _setOrigin] = useState<SkPoint>({ x: width / 2, y: height })
+  const startAtValue = useSharedValue(0.5)
+
+  const {
+    progress: progressFront,
+    pause: pauseFront,
+    run: runFront,
+  } = useProgress({
+    easing: Easing.out(Easing.ease),
+    duration: 1500,
+    waitUntilProgress: {
+      progress: progressOrchestration,
+      isValue: startAtValue,
+    },
+    waitUntilRun: false,
+  })
+
+  useAnimatedReaction(
+    () => progressFront.value,
+    value => {
+      console.log('progressFront ', value)
+    },
+  )
+
+  const {
+    progress: progressBack,
+    reset: resetBack,
+    pause: pauseBack,
+    run: runBack,
+  } = useProgress({
+    to: 0,
+    easing: Easing.out(Easing.ease),
+    duration: 2000,
+  })
+
+  const [origin, _setOrigin] = useState<SkPoint>({
+    x: width / 2,
+    y: height - bottomPadding,
+  })
   const [size, _setSize] = useState<SkPoint>({ x: 250, y: 250 })
 
   return (
