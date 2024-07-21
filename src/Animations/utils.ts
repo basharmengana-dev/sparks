@@ -50,10 +50,10 @@ export function* waitUntil({
   isValue,
 }: {
   value: SharedValue<number>
-  isValue: SharedValue<number>
+  isValue: number
 }) {
   'worklet'
-  while (value.value <= isValue.value) {
+  while (value.value <= isValue) {
     yield
   }
 }

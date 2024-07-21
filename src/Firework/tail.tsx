@@ -2,7 +2,7 @@ import { Path } from '../Path'
 import { SkPoint } from '@shopify/react-native-skia'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { Dimensions } from 'react-native'
-import { Easing, SharedValue, useSharedValue } from 'react-native-reanimated'
+import { Easing, SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../Animations/useProgress'
 
 const svg =
@@ -27,8 +27,8 @@ interface TailProps {
 
 export const Tail = forwardRef<TailRef, TailProps>(
   ({ progressOrchestration, bottomPadding = 0, isPaused }, ref) => {
-    const startFrontAtValue = useSharedValue(0)
-    const startBackAtValue = useSharedValue(0.5)
+    const [startFrontAtValue, _setStartFrontV] = useState(0)
+    const [startBackAtValue, _setStartBackValue] = useState(0.5)
 
     const {
       progress: progressFront,

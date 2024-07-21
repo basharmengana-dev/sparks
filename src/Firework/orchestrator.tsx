@@ -2,23 +2,20 @@ import { Button, View } from 'react-native'
 import { useProgress } from '../Animations/useProgress'
 import { Tail, TailRef } from './tail'
 import { Canvas } from '@shopify/react-native-skia'
-import { Easing, useAnimatedReaction } from 'react-native-reanimated'
+import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
 
 export const FireworkOrchestrator = () => {
   const [isPaused, setIsPaused] = useState(false)
   const tailRef = useRef<TailRef>(null)
 
-  const {
-    progress: progressOrchestration,
-    pause: pauseOrchestration,
-    readyToRun: runOrchestration,
-  } = useProgress({
-    to: 1,
-    from: 0,
-    easing: Easing.out(Easing.ease),
-    duration: 1500,
-  })
+  const { progress: progressOrchestration, readyToRun: runOrchestration } =
+    useProgress({
+      to: 1,
+      from: 0,
+      easing: Easing.out(Easing.ease),
+      duration: 1500,
+    })
 
   return (
     <>

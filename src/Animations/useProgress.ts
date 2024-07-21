@@ -24,7 +24,7 @@ export const useProgress = ({
   waitUntilRun?: boolean
   waitUntilProgress?: {
     progress: SharedValue<number>
-    isValue: SharedValue<number>
+    isValue: number
   } | null
 }) => {
   const pause = useSharedValue(false)
