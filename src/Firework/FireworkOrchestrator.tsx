@@ -1,6 +1,6 @@
 import { Button, Dimensions, View } from 'react-native'
 import { useProgress } from '../Animations/useProgress'
-import { Tail, TailRef } from './Tail1'
+import { Tail, TailRef } from './Tail'
 import { Canvas } from '@shopify/react-native-skia'
 import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
