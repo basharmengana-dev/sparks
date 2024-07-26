@@ -5,27 +5,30 @@ import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 
 export const Path = ({
-  svg,
+  points,
+  cellHeight,
+  cellWidth,
   maxIntersectionsAllowed,
   strokeWidth,
-  origin,
-  size,
   progressFront,
   progressBack,
   alphaProgress,
   colorBreakpoints,
 }: {
-  svg: string
+  points: SkPoint[]
+  cellWidth: number
+  cellHeight: number
   maxIntersectionsAllowed: number
   strokeWidth: number
-  origin: SkPoint
-  size: SkPoint
   progressFront: SharedValue<number>
   progressBack: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
   alphaProgress?: SharedValue<number>
 }) => {
-  const preparedPath = useMemo(() => new PathGeometry(svg, origin, size), [svg])
+  const preparedPath = useMemo(
+    () => new PathGeometry(points, cellWidth, cellHeight),
+    [points, cellWidth, cellHeight],
+  )
 
   const {
     flattenedPoints,
