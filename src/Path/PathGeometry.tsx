@@ -13,14 +13,12 @@ export class PathGeometry {
 
   constructor(points: SkPoint[], cellWidth: number, cellHeight: number) {
     const svg = this.createSmoothSVGPath(cellWidth, cellHeight, points)
-    let path = Skia.Path.MakeFromSVGString(svg)!
-
+    const path = Skia.Path.MakeFromSVGString(svg)!
     const it = Skia.ContourMeasureIter(path, false, 1)
     const contour: SkContourMeasure = it.next()!
 
     this.totalLength = contour.length()
     this.contour = contour
-
     this.path = path
   }
 
