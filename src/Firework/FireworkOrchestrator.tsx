@@ -39,40 +39,97 @@ export const FireworkOrchestrator = () => {
       { x: -1, y: 20 },
     ),
     color: c(1.0, 1.0, 0.878, 0.9),
+    duration: 2000,
   }
 
   const createSpark = (
     color: RGB,
+    duration: number,
     ...points: SkPoint[]
-  ): { points: SkPoint[]; color: RGB } => {
+  ): { points: SkPoint[]; color: RGB; duration: number } => {
     return {
       color,
       points: createLineWithOrigin(getLast(stem.points), ...points),
+      duration,
     }
   }
   const sparkCollection = [
     stem,
+    // Purple, right up
     createSpark(
       [0.6275, 0.1255, 0.9412],
+      1200,
       { x: 2, y: 2 },
       { x: 4, y: 5 },
       { x: 5, y: 10 },
     ),
+
+    // Green, left
     createSpark(
-      [0.6275, 0.1255, 0.9412],
+      [0.498, 1.0, 0.0],
+      1200,
       { x: -2, y: 2 },
       { x: -3, y: 4 },
       { x: -4, y: 7 },
     ),
+
+    // Purple, horizontal left
     createSpark(
       [0.6275, 0.1255, 0.9412],
+      1200,
       { x: -2, y: -1 },
       { x: -4, y: -1 },
       { x: -6, y: -1 },
     ),
-    createSpark([0.6275, 0.1255, 0.9412], { x: -2, y: 0 }, { x: -5, y: 1 }),
-    createSpark([0.6275, 0.1255, 0.9412], { x: 2, y: 0 }, { x: 4, y: 1 }),
-    createSpark([0.6275, 0.1255, 0.9412], { x: 0, y: 0 }, { x: 1, y: 4 }),
+
+    // Green left
+    createSpark([0.498, 1.0, 0.0], 1200, { x: -2, y: 0 }, { x: -5, y: 1 }),
+    createSpark([0.498, 1.0, 0.0], 1200, { x: -1, y: 0 }, { x: -3, y: 1 }),
+    createSpark([0.498, 1.0, 0.0], 1200, { x: -1, y: 0 }, { x: -4, y: 3 }),
+
+    // Purple, right
+    createSpark([0.6275, 0.1255, 0.9412], 1200, { x: 2, y: 0 }, { x: 4, y: 1 }),
+
+    // Purple, up
+    createSpark(
+      [0.6275, 0.1255, 0.9412],
+      1200,
+      { x: 0, y: 1 },
+      { x: 1, y: 10 },
+    ),
+
+    // Green, up
+    createSpark([0.498, 1.0, 0.0], 1200, { x: 0, y: 0 }, { x: 1, y: 4 }),
+
+    // Purple, left up
+    createSpark(
+      [0.6275, 0.1255, 0.9412],
+      1200,
+      { x: -3, y: 0 },
+      { x: -4, y: 2 },
+    ),
+
+    // Loops
+    createSpark(
+      [0.6275, 0.1255, 0.9412],
+      2000,
+      { x: 0, y: 3 },
+      { x: 0, y: 8 },
+      { x: 1, y: 7 },
+      { x: 0, y: 6 },
+      { x: -1, y: 7 },
+      { x: -2, y: 10 },
+    ),
+    createSpark(
+      [0.498, 1.0, 0.0],
+      2000,
+      { x: 1, y: 1 },
+      { x: 4, y: 4 },
+      { x: 5, y: 3 },
+      { x: 4, y: 2 },
+      { x: 3, y: 3 },
+      { x: 6, y: 10 },
+    ),
   ]
 
   const sparkRefCollection = Array.from(
@@ -93,7 +150,7 @@ export const FireworkOrchestrator = () => {
             { breakpoint: 1, color: c(0.0, 0.0, 0.0, 0.0) },
           ]}
           easing={Easing.out(Easing.ease)}
-          duration={2000}
+          duration={sparkCollection[0].duration}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
           startAtprogressOrchestration={0.0}
@@ -126,7 +183,7 @@ export const FireworkOrchestrator = () => {
               strokeWidth={3}
               progressOrchestration={progressOrchestration}
               easing={Easing.out(Easing.ease)}
-              duration={1500}
+              duration={spark.duration}
               startAtprogressOrchestration={0.9}
               destructAtFrontProgress={0.2}
               withDelay={900}
