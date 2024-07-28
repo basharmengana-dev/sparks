@@ -67,6 +67,8 @@ export const FireworkOrchestrator = () => {
             { breakpoint: 0.9, color: c(0.866, 0.627, 0.866, 0.7) },
             { breakpoint: 1, color: c(0.0, 0.0, 0.0, 0.0) },
           ]}
+          easing={Easing.out(Easing.ease)}
+          duration={2000}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
           startAtprogressOrchestration={0.0}
@@ -94,6 +96,8 @@ export const FireworkOrchestrator = () => {
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
+          easing={Easing.out(Easing.ease)}
+          duration={1500}
           startAtprogressOrchestration={0.9}
           destructAtFrontProgress={0.2}
           withDelay={900}
@@ -120,6 +124,8 @@ export const FireworkOrchestrator = () => {
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
+          easing={Easing.out(Easing.ease)}
+          duration={1300}
           startAtprogressOrchestration={0.9}
           destructAtFrontProgress={0.2}
           withDelay={900}

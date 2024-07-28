@@ -1,9 +1,10 @@
 import { Path } from '../Path'
 import { SkPoint } from '@shopify/react-native-skia'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { Easing, SharedValue } from 'react-native-reanimated'
+import { SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../Animations/useProgress'
 import { Grid } from '../Grid'
+import { EasingFunction } from '../Animations/utils'
 
 export interface SparkRef {
   readyToRun: () => void
@@ -17,6 +18,8 @@ interface SparkProps {
   }[]
   strokeWidth: number
   progressOrchestration: SharedValue<number>
+  easing: EasingFunction
+  duration: number
   withDelay?: number
   startAtprogressOrchestration: number
   destructAtFrontProgress: number
@@ -31,6 +34,8 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       colorsWithBreakpoints,
       strokeWidth,
       progressOrchestration,
+      easing,
+      duration,
       withDelay = null,
       startAtprogressOrchestration,
       destructAtFrontProgress,
@@ -46,8 +51,8 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
     } = useProgress({
       to: 1,
       from: 0,
-      easing: Easing.out(Easing.ease),
-      duration: 1500,
+      easing,
+      duration,
       withDelay,
       waitUntilProgress: {
         progress: progressOrchestration,
@@ -63,8 +68,8 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
     } = useProgress({
       to: 1,
       from: 0,
-      easing: Easing.out(Easing.ease),
-      duration: 2000,
+      easing,
+      duration,
       waitUntilProgress: {
         progress: progressFront,
         isValue: destructAtFrontProgress,
