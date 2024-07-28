@@ -5,6 +5,7 @@ import { Canvas } from '@shopify/react-native-skia'
 import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
+import { createLineWithOrigin } from '../Grid/utils'
 
 const { width, height } = Dimensions.get('window')
 
@@ -33,6 +34,20 @@ export const FireworkOrchestrator = () => {
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
         <Spark
+          points={createLineWithOrigin([
+            grid.getBottomCenter(),
+            { x: 1, y: 7 },
+            { x: 1, y: 14 },
+            { x: -1, y: 20 },
+          ])}
+          colorsWithBreakpoints={[
+            { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 1.0] },
+            { breakpoint: 0.6, color: [1.0, 1.0, 0.878, 0.9] },
+            { breakpoint: 0.75, color: [0.596, 0.984, 0.596, 0.8] },
+            { breakpoint: 0.9, color: [0.866, 0.627, 0.866, 0.7] },
+            { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.0] },
+          ]}
+          strokeWidth={3}
           progressOrchestration={progressOrchestration}
           paused={paused}
           ref={sparkRef}

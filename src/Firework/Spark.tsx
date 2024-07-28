@@ -4,37 +4,35 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { Easing, SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../Animations/useProgress'
 import { Grid } from '../Grid'
-import { createLineWithOrigin } from '../Grid/utils'
 
 export interface SparkRef {
   readyToRun: () => void
 }
 
 interface SparkProps {
+  points: SkPoint[]
+  colorsWithBreakpoints: {
+    breakpoint: number
+    color: number[]
+  }[]
+  strokeWidth: number
   progressOrchestration: SharedValue<number>
   paused: boolean
   grid: Grid
 }
 
 export const Spark = forwardRef<SparkRef, SparkProps>(
-  ({ progressOrchestration, paused, grid }, ref) => {
-    const [startFrontAtValue, _setStartFrontV] = useState(0)
-    const [startBackAtValue, _setStartBackValue] = useState(0.5)
-    const [colorBreakpoints, _setColorBreakpoints] = useState([
-      { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 1.0] },
-      { breakpoint: 0.6, color: [1.0, 1.0, 0.878, 0.9] },
-      { breakpoint: 0.75, color: [0.596, 0.984, 0.596, 0.8] },
-      { breakpoint: 0.9, color: [0.866, 0.627, 0.866, 0.7] },
-      { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.0] },
-    ])
-
-    const points: SkPoint[] = createLineWithOrigin([
-      grid.getBottomCenter(),
-      { x: 1, y: 7 },
-      { x: 1, y: 14 },
-      { x: -1, y: 20 },
-    ])
-
+  (
+    {
+      points,
+      colorsWithBreakpoints,
+      strokeWidth,
+      progressOrchestration,
+      paused,
+      grid,
+    },
+    ref,
+  ) => {
     const {
       progress: progressFront,
       pause: pauseFront,
@@ -46,7 +44,7 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       duration: 1500,
       waitUntilProgress: {
         progress: progressOrchestration,
-        isValue: startFrontAtValue,
+        isValue: 0,
       },
       waitUntilRun: false,
     })
@@ -62,7 +60,7 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       duration: 2000,
       waitUntilProgress: {
         progress: progressOrchestration,
-        isValue: startBackAtValue,
+        isValue: 0.5,
       },
       waitUntilRun: false,
     })
@@ -86,8 +84,8 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
         cellWidth={grid.cellWidth}
         gridHeight={grid.gridHeight}
         maxIntersectionsAllowed={2}
-        strokeWidth={3}
-        colorBreakpoints={colorBreakpoints}
+        strokeWidth={strokeWidth}
+        colorBreakpoints={colorsWithBreakpoints}
         progressFront={progressFront}
         progressBack={progressBack}
       />
