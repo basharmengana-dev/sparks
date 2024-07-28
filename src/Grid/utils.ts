@@ -1,6 +1,6 @@
 import { SkPoint } from '@shopify/react-native-skia'
 
-export const createLineWithOrigin = (points: SkPoint[]): SkPoint[] => {
+export const createLineWithOrigin = (...points: SkPoint[]): SkPoint[] => {
   if (points.length === 0) return []
 
   const [startPoint, ...rest] = points
@@ -13,3 +13,16 @@ export const createLineWithOrigin = (points: SkPoint[]): SkPoint[] => {
     })),
   ]
 }
+
+export const getLast = (points: SkPoint[]): SkPoint => {
+  if (points.length === 0) {
+    throw new Error('Points array cannot be empty')
+  }
+
+  return points[points.length - 1]
+}
+
+export const add = (a: SkPoint, x: SkPoint['x'], y: SkPoint['y']): SkPoint => ({
+  x: a.x + x,
+  y: a.y + y,
+})
