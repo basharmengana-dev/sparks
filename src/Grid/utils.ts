@@ -21,8 +21,3 @@ export const getLast = (points: SkPoint[]): SkPoint => {
 
   return points[points.length - 1]
 }
-
-export const add = (a: SkPoint, x: SkPoint['x'], y: SkPoint['y']): SkPoint => ({
-  x: a.x + x,
-  y: a.y + y,
-})
