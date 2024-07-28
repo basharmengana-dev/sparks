@@ -6,6 +6,7 @@ import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { add, createLineWithOrigin, getLast } from '../Grid/utils'
+import { c } from './utils'
 
 const { width, height } = Dimensions.get('window')
 
@@ -52,11 +53,11 @@ export const FireworkOrchestrator = () => {
         <Spark
           points={stem}
           colorsWithBreakpoints={[
-            { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 1.0] },
-            { breakpoint: 0.6, color: [1.0, 1.0, 0.878, 0.9] },
-            { breakpoint: 0.75, color: [0.596, 0.984, 0.596, 0.8] },
-            { breakpoint: 0.9, color: [0.866, 0.627, 0.866, 0.7] },
-            { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.0] },
+            { breakpoint: 0.0, color: c(1.0, 1.0, 1.0, 1.0) },
+            { breakpoint: 0.6, color: c(1.0, 1.0, 0.878, 0.9) },
+            { breakpoint: 0.75, color: c(0.596, 0.984, 0.596, 0.8) },
+            { breakpoint: 0.9, color: c(0.866, 0.627, 0.866, 0.7) },
+            { breakpoint: 1, color: c(0.0, 0.0, 0.0, 0.0) },
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
@@ -69,15 +70,24 @@ export const FireworkOrchestrator = () => {
         <Spark
           points={spark1}
           colorsWithBreakpoints={[
-            { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 0.6] },
-            { breakpoint: 0.6, color: [1.0, 1.0, 0.878, 0.4] },
-            { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.1] },
+            {
+              breakpoint: 0.0,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+            {
+              breakpoint: 0.6,
+              color: c(0.6275, 0.1255, 0.9412, 1),
+            },
+            {
+              breakpoint: 1,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
           startAtprogressOrchestration={0.99}
           destructAtFrontProgress={0.2}
-          withDelay={600}
+          withDelay={700}
           paused={paused}
           ref={sparkRefCollection[1]}
           grid={grid}
