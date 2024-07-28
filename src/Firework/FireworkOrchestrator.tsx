@@ -12,7 +12,8 @@ const { width, height } = Dimensions.get('window')
 
 export const FireworkOrchestrator = () => {
   const [paused, setPaused] = useState(false)
-  const sparkRefCollection = Array.from({ length: 2 }, () =>
+  const [visibleGrid, setVisibleGrid] = useState(true)
+  const sparkRefCollection = Array.from({ length: 3 }, () =>
     useRef<SparkRef>(null),
   )
 
@@ -47,6 +48,13 @@ export const FireworkOrchestrator = () => {
     { x: 5, y: 10 },
   )
 
+  const spark2 = createLineWithOrigin(
+    add(getLast(stem), -1, 1),
+    { x: -2, y: 2 },
+    { x: -3, y: 4 },
+    { x: -4, y: 7 },
+  )
+
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
@@ -67,6 +75,7 @@ export const FireworkOrchestrator = () => {
           ref={sparkRefCollection[0]}
           grid={grid}
         />
+
         <Spark
           points={spark1}
           colorsWithBreakpoints={[
@@ -85,14 +94,41 @@ export const FireworkOrchestrator = () => {
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
-          startAtprogressOrchestration={0.99}
+          startAtprogressOrchestration={0.9}
           destructAtFrontProgress={0.2}
-          withDelay={700}
+          withDelay={900}
           paused={paused}
           ref={sparkRefCollection[1]}
           grid={grid}
         />
-        {grid.generateCircles()}
+
+        <Spark
+          points={spark2}
+          colorsWithBreakpoints={[
+            {
+              breakpoint: 0.0,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+            {
+              breakpoint: 0.6,
+              color: c(0.6275, 0.1255, 0.9412, 1),
+            },
+            {
+              breakpoint: 1,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+          ]}
+          strokeWidth={3}
+          progressOrchestration={progressOrchestration}
+          startAtprogressOrchestration={0.9}
+          destructAtFrontProgress={0.2}
+          withDelay={900}
+          paused={paused}
+          ref={sparkRefCollection[2]}
+          grid={grid}
+        />
+
+        {visibleGrid && grid.generateCircles()}
       </Canvas>
       <View
         style={{
@@ -120,6 +156,13 @@ export const FireworkOrchestrator = () => {
               ref?.current?.readyToRun()
             })
             runOrchestration()
+          }}
+          color={'white'}
+        />
+        <Button
+          title={'🔳'}
+          onPress={() => {
+            setVisibleGrid(!visibleGrid)
           }}
           color={'white'}
         />
