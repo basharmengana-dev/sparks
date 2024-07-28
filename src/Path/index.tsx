@@ -26,7 +26,12 @@ export const Path = ({
   alphaProgress?: SharedValue<number>
 }) => {
   const preparedPath = useMemo(
-    () => new PathGeometry(points, cellWidth, cellHeight),
+    () =>
+      new PathGeometry({
+        points,
+        cellWidth,
+        cellHeight,
+      }),
     [points, cellWidth, cellHeight],
   )
 

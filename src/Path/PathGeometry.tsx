@@ -5,14 +5,27 @@ import type {
 } from '@shopify/react-native-skia'
 import { Skia } from '@shopify/react-native-skia'
 import { line, curveCatmullRom } from 'd3-shape'
+import { Dimensions } from 'react-native'
 
 export class PathGeometry {
   private totalLength = 0
   private contour: SkContourMeasure
   public path: SkPath
 
-  constructor(points: SkPoint[], cellWidth: number, cellHeight: number) {
-    const svg = this.createSmoothSVGPath(cellWidth, cellHeight, points)
+  constructor({
+    points,
+    cellWidth,
+    cellHeight,
+  }: {
+    points: SkPoint[]
+    cellWidth: number
+    cellHeight: number
+  }) {
+    const svg = this.createSmoothSVGPath({
+      points,
+      cellWidth,
+      cellHeight,
+    })
     const path = Skia.Path.MakeFromSVGString(svg)!
     const it = Skia.ContourMeasureIter(path, false, 1)
     const contour: SkContourMeasure = it.next()!
@@ -162,18 +175,22 @@ export class PathGeometry {
     return intersections.flat()
   }
 
-  private createSmoothSVGPath(
-    cellWidth: number,
-    cellHeight: number,
-    points: SkPoint[],
-  ): string {
+  private createSmoothSVGPath({
+    cellHeight,
+    cellWidth,
+    points,
+  }: {
+    cellWidth: number
+    cellHeight: number
+    points: SkPoint[]
+  }): string {
     if (points.length === 0) {
       return ''
     }
-
-    const scaledPoints = points.map(p => ({
+    const { height } = Dimensions.get('window')
+    const newPoints = points.map(p => ({
       x: p.x * cellWidth,
-      y: p.y * cellHeight,
+      y: height - p.y * cellHeight,
     }))
 
     const lineGenerator = line<SkPoint>()
@@ -181,7 +198,7 @@ export class PathGeometry {
       .y(d => d.y)
       .curve(curveCatmullRom)
 
-    const pathData = lineGenerator(scaledPoints)
+    const pathData = lineGenerator(newPoints)
 
     if (!pathData) {
       return ''

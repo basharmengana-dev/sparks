@@ -12,12 +12,14 @@ export const FireworkOrchestrator = () => {
   const [paused, setPaused] = useState(false)
   const tailRef = useRef<TailRef>(null)
 
-  const gridOptions = {
+  const grid = new Grid({
     gridWidth: width,
     gridHeight: height,
-    cellWidth: 50,
-    cellHeight: 50,
-  }
+    cellWidth: 20,
+    cellHeight: 20,
+    color: 'chartreuse',
+    radius: 1,
+  })
 
   const { progress: progressOrchestration, readyToRun: runOrchestration } =
     useProgress({
@@ -34,16 +36,9 @@ export const FireworkOrchestrator = () => {
           progressOrchestration={progressOrchestration}
           paused={paused}
           ref={tailRef}
-          gridOptions={gridOptions}
+          grid={grid}
         />
-        <Grid
-          cellHeight={gridOptions.cellHeight}
-          cellWidth={gridOptions.cellWidth}
-          gridHeight={gridOptions.gridHeight}
-          gridWidth={gridOptions.gridWidth}
-          color="green"
-          radius={3}
-        />
+        {grid.generateCircles()}
       </Canvas>
       <View
         style={{

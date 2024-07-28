@@ -3,7 +3,8 @@ import { SkPoint } from '@shopify/react-native-skia'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { Easing, SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../Animations/useProgress'
-import { GridOptions } from '../Grid'
+import { Grid } from '../Grid'
+import { createLineWithOrigin } from '../Grid/utils'
 
 export interface TailRef {
   readyToRun: () => void
@@ -12,14 +13,11 @@ export interface TailRef {
 interface TailProps {
   progressOrchestration: SharedValue<number>
   paused: boolean
-  gridOptions: GridOptions
+  grid: Grid
 }
 
 export const Tail = forwardRef<TailRef, TailProps>(
-  (
-    { progressOrchestration, paused, gridOptions: { cellHeight, cellWidth } },
-    ref,
-  ) => {
+  ({ progressOrchestration, paused, grid }, ref) => {
     const [startFrontAtValue, _setStartFrontV] = useState(0)
     const [startBackAtValue, _setStartBackValue] = useState(0.5)
     const [colorBreakpoints, _setColorBreakpoints] = useState([
@@ -30,13 +28,12 @@ export const Tail = forwardRef<TailRef, TailProps>(
       { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.0] },
     ])
 
-    const points: SkPoint[] = [
-      { x: 1, y: 3 },
-      { x: 3, y: 2 },
-      { x: 5, y: 5 },
-      { x: 3, y: 5 },
-      { x: 3, y: 1 },
-    ]
+    const points: SkPoint[] = createLineWithOrigin([
+      grid.getBottomCenter(),
+      { x: 1, y: 7 },
+      { x: 1, y: 14 },
+      { x: -1, y: 20 },
+    ])
 
     const {
       progress: progressFront,
@@ -85,8 +82,8 @@ export const Tail = forwardRef<TailRef, TailProps>(
     return (
       <Path
         points={points}
-        cellHeight={cellHeight}
-        cellWidth={cellWidth}
+        cellHeight={grid.cellHeight}
+        cellWidth={grid.cellWidth}
         maxIntersectionsAllowed={2}
         strokeWidth={3}
         colorBreakpoints={colorBreakpoints}
