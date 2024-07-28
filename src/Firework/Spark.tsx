@@ -6,17 +6,17 @@ import { useProgress } from '../Animations/useProgress'
 import { Grid } from '../Grid'
 import { createLineWithOrigin } from '../Grid/utils'
 
-export interface TailRef {
+export interface SparkRef {
   readyToRun: () => void
 }
 
-interface TailProps {
+interface SparkProps {
   progressOrchestration: SharedValue<number>
   paused: boolean
   grid: Grid
 }
 
-export const Tail = forwardRef<TailRef, TailProps>(
+export const Spark = forwardRef<SparkRef, SparkProps>(
   ({ progressOrchestration, paused, grid }, ref) => {
     const [startFrontAtValue, _setStartFrontV] = useState(0)
     const [startBackAtValue, _setStartBackValue] = useState(0.5)

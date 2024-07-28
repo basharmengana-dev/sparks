@@ -1,6 +1,6 @@
 import { Button, Dimensions, View } from 'react-native'
 import { useProgress } from '../Animations/useProgress'
-import { Tail, TailRef } from './Tail'
+import { Spark, SparkRef } from './Spark'
 import { Canvas } from '@shopify/react-native-skia'
 import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get('window')
 
 export const FireworkOrchestrator = () => {
   const [paused, setPaused] = useState(false)
-  const tailRef = useRef<TailRef>(null)
+  const sparkRef = useRef<SparkRef>(null)
 
   const grid = new Grid({
     gridWidth: width,
@@ -32,10 +32,10 @@ export const FireworkOrchestrator = () => {
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
-        <Tail
+        <Spark
           progressOrchestration={progressOrchestration}
           paused={paused}
-          ref={tailRef}
+          ref={sparkRef}
           grid={grid}
         />
         {grid.generateCircles()}
@@ -62,7 +62,7 @@ export const FireworkOrchestrator = () => {
         <Button
           title={'🎊'}
           onPress={() => {
-            tailRef.current?.readyToRun()
+            sparkRef.current?.readyToRun()
             runOrchestration()
           }}
           color={'white'}
