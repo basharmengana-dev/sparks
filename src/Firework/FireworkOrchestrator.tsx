@@ -39,7 +39,12 @@ export const FireworkOrchestrator = () => {
     { x: -1, y: 20 },
   )
 
-  const spark1 = createLineWithOrigin(add(getLast(stem), 0, 1), { x: 2, y: 3 })
+  const spark1 = createLineWithOrigin(
+    add(getLast(stem), 0, 1),
+    { x: 2, y: 2 },
+    { x: 4, y: 5 },
+    { x: 5, y: 10 },
+  )
 
   return (
     <>
@@ -64,13 +69,15 @@ export const FireworkOrchestrator = () => {
         <Spark
           points={spark1}
           colorsWithBreakpoints={[
-            { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 1.0] },
-            { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.0] },
+            { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 0.6] },
+            { breakpoint: 0.6, color: [1.0, 1.0, 0.878, 0.4] },
+            { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.1] },
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
           startAtprogressOrchestration={0.99}
           destructAtFrontProgress={0.2}
+          withDelay={600}
           paused={paused}
           ref={sparkRefCollection[1]}
           grid={grid}

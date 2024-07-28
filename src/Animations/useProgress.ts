@@ -4,6 +4,7 @@ import {
   makeAnimation,
   timing,
   useAnimation,
+  wait,
   waitUntil,
 } from './utils'
 
@@ -12,6 +13,7 @@ export const useProgress = ({
   easing,
   to,
   from,
+  withDelay = null,
   repeat = false,
   waitUntilRun = true,
   waitUntilProgress = null,
@@ -20,6 +22,7 @@ export const useProgress = ({
   easing: EasingFunction
   to: number
   from: number
+  withDelay?: number | null
   repeat?: boolean
   waitUntilRun?: boolean
   waitUntilProgress?: {
@@ -41,6 +44,10 @@ export const useProgress = ({
             value: waitUntilProgress.progress,
             isValue: waitUntilProgress.isValue,
           })
+        }
+
+        if (withDelay) {
+          yield* wait(withDelay)
         }
 
         yield* timing(progress, {

@@ -58,6 +58,15 @@ export function* waitUntil({
   }
 }
 
+export function* wait(duration: number) {
+  'worklet'
+  const from: number = yield
+  const to = from + duration
+  for (let current = from; current < to; ) {
+    current += yield* timeSincePreviousFrame()
+  }
+}
+
 export const makeAnimation = <S extends AnimationState>(
   animation: (state: AnimationValues<S>) => Generator,
   state: S,

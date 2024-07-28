@@ -17,6 +17,7 @@ interface SparkProps {
   }[]
   strokeWidth: number
   progressOrchestration: SharedValue<number>
+  withDelay?: number
   startAtprogressOrchestration: number
   destructAtFrontProgress: number
   paused: boolean
@@ -30,6 +31,7 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       colorsWithBreakpoints,
       strokeWidth,
       progressOrchestration,
+      withDelay = null,
       startAtprogressOrchestration,
       destructAtFrontProgress,
       paused,
@@ -46,6 +48,7 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       from: 0,
       easing: Easing.out(Easing.ease),
       duration: 1500,
+      withDelay,
       waitUntilProgress: {
         progress: progressOrchestration,
         isValue: startAtprogressOrchestration,
