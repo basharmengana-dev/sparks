@@ -8,6 +8,7 @@ export const Path = ({
   points,
   cellHeight,
   cellWidth,
+  gridHeight,
   maxIntersectionsAllowed,
   strokeWidth,
   progressFront,
@@ -18,6 +19,7 @@ export const Path = ({
   points: SkPoint[]
   cellWidth: number
   cellHeight: number
+  gridHeight: number
   maxIntersectionsAllowed: number
   strokeWidth: number
   progressFront: SharedValue<number>
@@ -31,6 +33,7 @@ export const Path = ({
         points,
         cellWidth,
         cellHeight,
+        gridHeight,
       }),
     [points, cellWidth, cellHeight],
   )

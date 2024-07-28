@@ -84,6 +84,7 @@ export const Tail = forwardRef<TailRef, TailProps>(
         points={points}
         cellHeight={grid.cellHeight}
         cellWidth={grid.cellWidth}
+        gridHeight={grid.gridHeight}
         maxIntersectionsAllowed={2}
         strokeWidth={3}
         colorBreakpoints={colorBreakpoints}

@@ -87,7 +87,8 @@ export class Grid {
     for (let i = 0; i < gridColumns; i++) {
       for (let j = 0; j < gridRows; j++) {
         const cx = i * this.cellWidth
-        const cy = j * this.cellHeight
+        const cy = this.gridHeight - j * this.cellHeight
+
         circles.push(
           <Circle
             cx={cx}

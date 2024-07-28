@@ -5,7 +5,6 @@ import type {
 } from '@shopify/react-native-skia'
 import { Skia } from '@shopify/react-native-skia'
 import { line, curveCatmullRom } from 'd3-shape'
-import { Dimensions } from 'react-native'
 
 export class PathGeometry {
   private totalLength = 0
@@ -16,15 +15,18 @@ export class PathGeometry {
     points,
     cellWidth,
     cellHeight,
+    gridHeight,
   }: {
     points: SkPoint[]
     cellWidth: number
     cellHeight: number
+    gridHeight: number
   }) {
     const svg = this.createSmoothSVGPath({
       points,
       cellWidth,
       cellHeight,
+      gridHeight,
     })
     const path = Skia.Path.MakeFromSVGString(svg)!
     const it = Skia.ContourMeasureIter(path, false, 1)
@@ -179,18 +181,20 @@ export class PathGeometry {
     cellHeight,
     cellWidth,
     points,
+    gridHeight,
   }: {
     cellWidth: number
     cellHeight: number
     points: SkPoint[]
+    gridHeight: number
   }): string {
     if (points.length === 0) {
       return ''
     }
-    const { height } = Dimensions.get('window')
+
     const newPoints = points.map(p => ({
       x: p.x * cellWidth,
-      y: height - p.y * cellHeight,
+      y: gridHeight - p.y * cellHeight,
     }))
 
     const lineGenerator = line<SkPoint>()
