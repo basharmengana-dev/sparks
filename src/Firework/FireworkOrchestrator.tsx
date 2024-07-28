@@ -13,9 +13,6 @@ const { width, height } = Dimensions.get('window')
 export const FireworkOrchestrator = () => {
   const [paused, setPaused] = useState(false)
   const [visibleGrid, setVisibleGrid] = useState(true)
-  const sparkRefCollection = Array.from({ length: 3 }, () =>
-    useRef<SparkRef>(null),
-  )
 
   const grid = new Grid({
     gridWidth: width,
@@ -42,24 +39,44 @@ export const FireworkOrchestrator = () => {
   )
 
   const spark1 = createLineWithOrigin(
-    add(getLast(stem), 0, 1),
+    getLast(stem),
     { x: 2, y: 2 },
     { x: 4, y: 5 },
     { x: 5, y: 10 },
   )
 
   const spark2 = createLineWithOrigin(
-    add(getLast(stem), -1, 1),
+    getLast(stem),
     { x: -2, y: 2 },
     { x: -3, y: 4 },
     { x: -4, y: 7 },
+  )
+
+  const spark3 = createLineWithOrigin(
+    getLast(stem),
+    { x: -2, y: -1 },
+    { x: -4, y: -1 },
+    { x: -6, y: -1 },
+  )
+
+  const spark4 = createLineWithOrigin(
+    getLast(stem),
+    { x: -2, y: 0 },
+    { x: -5, y: 1 },
+  )
+
+  const sparkCollection = [stem, spark1, spark2, spark3, spark4]
+
+  const sparkRefCollection = Array.from(
+    { length: sparkCollection.length },
+    () => useRef<SparkRef>(null),
   )
 
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
         <Spark
-          points={stem}
+          points={sparkCollection[0]}
           colorsWithBreakpoints={[
             { breakpoint: 0.0, color: c(1.0, 1.0, 1.0, 1.0) },
             { breakpoint: 0.6, color: c(1.0, 1.0, 0.878, 0.9) },
@@ -79,7 +96,7 @@ export const FireworkOrchestrator = () => {
         />
 
         <Spark
-          points={spark1}
+          points={sparkCollection[1]}
           colorsWithBreakpoints={[
             {
               breakpoint: 0.0,
@@ -107,7 +124,7 @@ export const FireworkOrchestrator = () => {
         />
 
         <Spark
-          points={spark2}
+          points={sparkCollection[2]}
           colorsWithBreakpoints={[
             {
               breakpoint: 0.0,
@@ -134,6 +151,61 @@ export const FireworkOrchestrator = () => {
           grid={grid}
         />
 
+        <Spark
+          points={sparkCollection[3]}
+          colorsWithBreakpoints={[
+            {
+              breakpoint: 0.0,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+            {
+              breakpoint: 0.6,
+              color: c(0.6275, 0.1255, 0.9412, 1),
+            },
+            {
+              breakpoint: 1,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+          ]}
+          strokeWidth={3}
+          progressOrchestration={progressOrchestration}
+          easing={Easing.out(Easing.ease)}
+          duration={1300}
+          startAtprogressOrchestration={0.9}
+          destructAtFrontProgress={0.2}
+          withDelay={900}
+          paused={paused}
+          ref={sparkRefCollection[3]}
+          grid={grid}
+        />
+
+        <Spark
+          points={sparkCollection[4]}
+          colorsWithBreakpoints={[
+            {
+              breakpoint: 0.0,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+            {
+              breakpoint: 0.6,
+              color: c(0.6275, 0.1255, 0.9412, 1),
+            },
+            {
+              breakpoint: 1,
+              color: c(0.6275, 0.1255, 0.9412, 0.3),
+            },
+          ]}
+          strokeWidth={3}
+          progressOrchestration={progressOrchestration}
+          easing={Easing.out(Easing.ease)}
+          duration={1300}
+          startAtprogressOrchestration={0.9}
+          destructAtFrontProgress={0.2}
+          withDelay={900}
+          paused={paused}
+          ref={sparkRefCollection[4]}
+          grid={grid}
+        />
         {visibleGrid && grid.generateCircles()}
       </Canvas>
       <View
