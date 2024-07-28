@@ -5,13 +5,15 @@ import { Canvas } from '@shopify/react-native-skia'
 import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
-import { createLineWithOrigin } from '../Grid/utils'
+import { add, createLineWithOrigin, getLast } from '../Grid/utils'
 
 const { width, height } = Dimensions.get('window')
 
 export const FireworkOrchestrator = () => {
   const [paused, setPaused] = useState(false)
-  const sparkRef = useRef<SparkRef>(null)
+  const sparkRefCollection = Array.from({ length: 2 }, () =>
+    useRef<SparkRef>(null),
+  )
 
   const grid = new Grid({
     gridWidth: width,
@@ -30,16 +32,20 @@ export const FireworkOrchestrator = () => {
       duration: 1500,
     })
 
+  const stem = createLineWithOrigin(
+    grid.getBottomCenter(),
+    { x: 1, y: 7 },
+    { x: 1, y: 14 },
+    { x: -1, y: 20 },
+  )
+
+  const spark1 = createLineWithOrigin(add(getLast(stem), 0, 1), { x: 2, y: 3 })
+
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
         <Spark
-          points={createLineWithOrigin([
-            grid.getBottomCenter(),
-            { x: 1, y: 7 },
-            { x: 1, y: 14 },
-            { x: -1, y: 20 },
-          ])}
+          points={stem}
           colorsWithBreakpoints={[
             { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 1.0] },
             { breakpoint: 0.6, color: [1.0, 1.0, 0.878, 0.9] },
@@ -49,8 +55,24 @@ export const FireworkOrchestrator = () => {
           ]}
           strokeWidth={3}
           progressOrchestration={progressOrchestration}
+          startAtprogressOrchestration={0.0}
+          destructAtFrontProgress={0.2}
           paused={paused}
-          ref={sparkRef}
+          ref={sparkRefCollection[0]}
+          grid={grid}
+        />
+        <Spark
+          points={spark1}
+          colorsWithBreakpoints={[
+            { breakpoint: 0.0, color: [1.0, 1.0, 1.0, 1.0] },
+            { breakpoint: 1, color: [0.0, 0.0, 0.0, 0.0] },
+          ]}
+          strokeWidth={3}
+          progressOrchestration={progressOrchestration}
+          startAtprogressOrchestration={0.99}
+          destructAtFrontProgress={0.2}
+          paused={paused}
+          ref={sparkRefCollection[1]}
           grid={grid}
         />
         {grid.generateCircles()}
@@ -77,7 +99,9 @@ export const FireworkOrchestrator = () => {
         <Button
           title={'🎊'}
           onPress={() => {
-            sparkRef.current?.readyToRun()
+            sparkRefCollection.forEach(ref => {
+              ref?.current?.readyToRun()
+            })
             runOrchestration()
           }}
           color={'white'}
