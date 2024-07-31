@@ -1,5 +1,7 @@
 import { Dimensions } from 'react-native'
 import { Circle } from '@shopify/react-native-skia'
+import { SharedValue } from 'react-native-reanimated'
+import { RGBA } from '../Firework/utils'
 
 const { width, height } = Dimensions.get('window')
 
@@ -17,7 +19,6 @@ export class Grid {
   gridHeight: number
   cellWidth: number
   cellHeight: number
-  color: string
   radius: number
 
   constructor({
@@ -32,7 +33,6 @@ export class Grid {
     this.gridHeight = gridHeight
     this.cellWidth = cellWidth
     this.cellHeight = cellHeight
-    this.color = color
     this.radius = radius
   }
 
@@ -78,7 +78,7 @@ export class Grid {
   }
 
   // Method to generate grid circles
-  generateCircles() {
+  generateCircles(color: SharedValue<RGBA>) {
     const gridColumns = Math.ceil(this.gridWidth / this.cellWidth)
     const gridRows = Math.ceil(this.gridHeight / this.cellHeight)
 
@@ -94,7 +94,7 @@ export class Grid {
             cx={cx}
             cy={cy}
             r={this.radius}
-            color={this.color}
+            color={color}
             key={`${i}-${j}`}
           />,
         )

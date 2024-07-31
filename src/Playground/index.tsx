@@ -3,13 +3,20 @@ import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
-import { useSharedValue } from 'react-native-reanimated'
+import {
+  useAnimatedReaction,
+  useSharedValue,
+  runOnJS,
+} from 'react-native-reanimated'
+import { RGBA } from '../Firework/utils'
 
 const { width, height } = Dimensions.get('window')
 
 export const Playground = () => {
   const paused = useSharedValue(false)
-  const [visibleGrid, setVisibleGrid] = useState(true)
+  const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
+
+  const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
 
   const grid = new Grid({
@@ -21,6 +28,13 @@ export const Playground = () => {
     radius: 1,
   })
 
+  useAnimatedReaction(
+    () => paused.value,
+    value => {
+      runOnJS(setPausedAvatar)(value)
+    },
+  )
+
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
@@ -29,7 +43,7 @@ export const Playground = () => {
           paused={paused}
           ref={fireworkOchestration}
         />
-        {visibleGrid && grid.generateCircles()}
+        {grid.generateCircles(gridColor)}
       </Canvas>
       <View
         style={{
@@ -44,7 +58,7 @@ export const Playground = () => {
           columnGap: 10,
         }}>
         <Button
-          title={paused.value ? '▶️' : '⏸️'}
+          title={pausedAvatar ? '▶️' : '⏸️'}
           onPress={() => {
             'worklet'
             paused.value = !paused.value
@@ -61,7 +75,11 @@ export const Playground = () => {
         <Button
           title={'🔳'}
           onPress={() => {
-            setVisibleGrid(!visibleGrid)
+            if (gridColor.value[3] === 1) {
+              gridColor.value = [0.0, 0.0, 0.0, 0.0]
+            } else {
+              gridColor.value = [0.596, 0.984, 0.596, 1.0]
+            }
           }}
           color={'white'}
         />

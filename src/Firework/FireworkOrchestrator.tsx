@@ -26,7 +26,7 @@ export const FireworkOrchestrator = forwardRef<
       from: 0,
       easing: Easing.out(Easing.ease),
       duration: 1500,
-      paused: useSharedValue(false),
+      paused,
     })
 
   const stem = {
