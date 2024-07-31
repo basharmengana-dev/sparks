@@ -7,8 +7,11 @@ import {
   useAnimatedReaction,
   useSharedValue,
   runOnJS,
+  Easing,
 } from 'react-native-reanimated'
-import { RGBA } from '../Firework/utils'
+import { c, RGBA } from '../Firework/utils'
+import { Line, LineRef } from '../AnimationObjects/Line'
+import { add, createLineWithOrigin } from '../Grid/utils'
 
 const { width, height } = Dimensions.get('window')
 
@@ -18,6 +21,7 @@ export const Playground = () => {
 
   const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
+  const lineRef = useRef<LineRef>(null)
 
   const grid = new Grid({
     gridWidth: width,
@@ -42,6 +46,23 @@ export const Playground = () => {
           grid={grid}
           paused={paused}
           ref={fireworkOchestration}
+        />
+        <Line
+          points={createLineWithOrigin(
+            add(grid.getBottomCenter(), { x: 0, y: 5 }),
+            { x: 0, y: 20 },
+          )}
+          colorsWithBreakpoints={[
+            { breakpoint: 0, color: c(0.0, 0.0, 1.0, 1.0) },
+            { breakpoint: 0.5, color: c(0.0, 0.8, 0.7, 0.7) },
+            { breakpoint: 1, color: c(0.0, 0.8, 0.7, 0.0) },
+          ]}
+          strokeWidth={2}
+          grid={grid}
+          paused={paused}
+          easing={Easing.inOut(Easing.ease)}
+          duration={1000}
+          ref={lineRef}
         />
         {grid.generateCircles(gridColor)}
       </Canvas>
@@ -69,6 +90,13 @@ export const Playground = () => {
           title={'🎊'}
           onPress={() => {
             fireworkOchestration.current?.run()
+          }}
+          color={'white'}
+        />
+        <Button
+          title={'📈'}
+          onPress={() => {
+            lineRef.current?.run()
           }}
           color={'white'}
         />
