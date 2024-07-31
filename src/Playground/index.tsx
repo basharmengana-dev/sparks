@@ -1,13 +1,15 @@
 import { Button, Dimensions, View } from 'react-native'
 import { Canvas } from '@shopify/react-native-skia'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
+import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 
 const { width, height } = Dimensions.get('window')
 
-export const FireworkOrchestrator = () => {
+export const Playground = () => {
   const [paused, setPaused] = useState(false)
   const [visibleGrid, setVisibleGrid] = useState(true)
+  const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
 
   const grid = new Grid({
     gridWidth: width,
@@ -21,6 +23,11 @@ export const FireworkOrchestrator = () => {
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
+        <FireworkOrchestrator
+          grid={grid}
+          paused={paused}
+          ref={fireworkOchestration}
+        />
         {visibleGrid && grid.generateCircles()}
       </Canvas>
       <View
@@ -36,7 +43,7 @@ export const FireworkOrchestrator = () => {
           columnGap: 10,
         }}>
         <Button
-          title={'⏸️'}
+          title={paused ? '▶️' : '⏸️'}
           onPress={() => {
             setPaused(!paused)
           }}
@@ -45,10 +52,7 @@ export const FireworkOrchestrator = () => {
         <Button
           title={'🎊'}
           onPress={() => {
-            // sparkRefCollection.forEach(ref => {
-            //   ref?.current?.readyToRun()
-            // })
-            // runOrchestration()
+            fireworkOchestration.current?.readyToRun()
           }}
           color={'white'}
         />

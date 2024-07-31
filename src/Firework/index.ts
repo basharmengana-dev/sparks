@@ -1,1 +1,2 @@
-export { FireworkOrchestrator as Firework } from './FireworkOrchestrator'
+export { FireworkOrchestrator } from './FireworkOrchestrator'
+export type { FireworkOrchestratorRef } from './FireworkOrchestrator'

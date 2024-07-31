@@ -1,8 +1,8 @@
 import React from 'react'
-import { Firework } from './src/Firework'
+import { Playground } from './src/Playground'
 
 function App(): React.JSX.Element {
-  return <Firework />
+  return <Playground />
 }
 
 export default App
