@@ -17,6 +17,7 @@ export const useProgress = ({
   repeat = false,
   waitUntilRun = true,
   waitUntilProgress = null,
+  paused,
 }: {
   duration: number
   easing: EasingFunction
@@ -29,8 +30,8 @@ export const useProgress = ({
     progress: SharedValue<number>
     isValue: number
   } | null
+  paused: SharedValue<boolean>
 }) => {
-  const pause = useSharedValue(false)
   const run = useSharedValue(!waitUntilRun)
   const toValue = useSharedValue(to)
 
@@ -67,14 +68,11 @@ export const useProgress = ({
   const {
     values: { progress },
     initializeGenerator,
-  } = useAnimation(animation, pause)
+  } = useAnimation(animation, paused)
 
   return {
     progress,
-    pause: (pauseState: boolean) => {
-      pause.value = pauseState
-    },
-    readyToRun: () => {
+    run: () => {
       runOnUI(initializeGenerator)()
       toValue.value = to
       progress.value = from

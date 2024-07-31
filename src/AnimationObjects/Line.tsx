@@ -1,13 +1,14 @@
 import { Path } from '../Path'
 import { SkPoint } from '@shopify/react-native-skia'
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import { useProgress } from '../AnimationCore/useProgress'
 import { Grid } from '../Grid'
 import { EasingFunction } from '../AnimationCore/utils'
+import { Share } from 'react-native'
 
 export interface LineRef {
-  readyToRun: () => void
+  run: () => void
 }
 
 interface LineProps {
@@ -23,7 +24,7 @@ interface LineProps {
   withDelay?: number
   startAtprogressOrchestration: number
   destructAtFrontProgress: number
-  paused: boolean
+  paused: SharedValue<boolean>
   grid: Grid
 }
 
@@ -43,11 +44,7 @@ export const Line = forwardRef<LineRef, LineProps>(
     },
     ref,
   ) => {
-    const {
-      progress: progressFront,
-      pause: pauseFront,
-      readyToRun: readyToRunFront,
-    } = useProgress({
+    const { progress: progressFront, run } = useProgress({
       to: 1,
       from: 0,
       easing,
@@ -58,16 +55,11 @@ export const Line = forwardRef<LineRef, LineProps>(
         isValue: startAtprogressOrchestration,
       },
       waitUntilRun: false,
+      paused,
     })
 
-    useEffect(() => {
-      pauseFront(paused)
-    }, [paused])
-
     useImperativeHandle(ref, () => ({
-      readyToRun() {
-        readyToRunFront()
-      },
+      run,
     }))
 
     return (

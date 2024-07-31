@@ -1,13 +1,13 @@
 import { Path } from '../Path'
 import { SkPoint } from '@shopify/react-native-skia'
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle } from 'react'
 import { SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../AnimationCore/useProgress'
 import { Grid } from '../Grid'
 import { EasingFunction } from '../AnimationCore/utils'
 
 export interface SparkRef {
-  readyToRun: () => void
+  run: () => void
 }
 
 interface SparkProps {
@@ -23,7 +23,7 @@ interface SparkProps {
   withDelay?: number
   startAtprogressOrchestration: number
   destructAtFrontProgress: number
-  paused: boolean
+  paused: SharedValue<boolean>
   grid: Grid
 }
 
@@ -44,11 +44,7 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
     },
     ref,
   ) => {
-    const {
-      progress: progressFront,
-      pause: pauseFront,
-      readyToRun: readyToRunFront,
-    } = useProgress({
+    const { progress: progressFront, run: runFront } = useProgress({
       to: 1,
       from: 0,
       easing,
@@ -59,13 +55,10 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
         isValue: startAtprogressOrchestration,
       },
       waitUntilRun: false,
+      paused,
     })
 
-    const {
-      progress: progressBack,
-      pause: pauseBack,
-      readyToRun: readyToRunBack,
-    } = useProgress({
+    const { progress: progressBack, run: runBack } = useProgress({
       to: 1,
       from: 0,
       easing,
@@ -75,17 +68,13 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
         isValue: destructAtFrontProgress,
       },
       waitUntilRun: false,
+      paused,
     })
 
-    useEffect(() => {
-      pauseFront(paused)
-      pauseBack(paused)
-    }, [paused])
-
     useImperativeHandle(ref, () => ({
-      readyToRun() {
-        readyToRunBack()
-        readyToRunFront()
+      run() {
+        runFront()
+        runBack()
       },
     }))
 

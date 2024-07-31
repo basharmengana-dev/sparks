@@ -3,11 +3,12 @@ import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
+import { useSharedValue } from 'react-native-reanimated'
 
 const { width, height } = Dimensions.get('window')
 
 export const Playground = () => {
-  const [paused, setPaused] = useState(false)
+  const paused = useSharedValue(false)
   const [visibleGrid, setVisibleGrid] = useState(true)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
 
@@ -43,16 +44,17 @@ export const Playground = () => {
           columnGap: 10,
         }}>
         <Button
-          title={paused ? '▶️' : '⏸️'}
+          title={paused.value ? '▶️' : '⏸️'}
           onPress={() => {
-            setPaused(!paused)
+            'worklet'
+            paused.value = !paused.value
           }}
           color={'white'}
         />
         <Button
           title={'🎊'}
           onPress={() => {
-            fireworkOchestration.current?.readyToRun()
+            fireworkOchestration.current?.run()
           }}
           color={'white'}
         />
