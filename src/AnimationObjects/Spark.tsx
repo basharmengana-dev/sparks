@@ -2,9 +2,9 @@ import { Path } from '../Path'
 import { SkPoint } from '@shopify/react-native-skia'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { SharedValue } from 'react-native-reanimated'
-import { useProgress } from '../Animations/useProgress'
+import { useProgress } from '../AnimationCore/useProgress'
 import { Grid } from '../Grid'
-import { EasingFunction } from '../Animations/utils'
+import { EasingFunction } from '../AnimationCore/utils'
 
 export interface SparkRef {
   readyToRun: () => void

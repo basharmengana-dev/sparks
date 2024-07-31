@@ -1,6 +1,6 @@
 import { Button, Dimensions, View } from 'react-native'
-import { useProgress } from '../Animations/useProgress'
-import { Spark, SparkRef } from './Spark'
+import { useProgress } from '../AnimationCore/useProgress'
+import { Spark, SparkRef } from '../AnimationObjects/Spark'
 import { Canvas, SkPoint } from '@shopify/react-native-skia'
 import { Easing } from 'react-native-reanimated'
 import { useRef, useState } from 'react'
