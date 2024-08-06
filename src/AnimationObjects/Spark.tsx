@@ -8,6 +8,7 @@ import { EasingFunction } from '../AnimationCore/utils'
 
 export interface SparkRef {
   run: () => void
+  reset: () => void
 }
 
 interface SparkProps {
@@ -44,7 +45,11 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
     },
     ref,
   ) => {
-    const { progress: progressFront, run: runFront } = useProgress({
+    const {
+      progress: progressFront,
+      run: runFront,
+      reset: resetFront,
+    } = useProgress({
       to: 1,
       from: 0,
       easing,
@@ -58,7 +63,11 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       paused,
     })
 
-    const { progress: progressBack, run: runBack } = useProgress({
+    const {
+      progress: progressBack,
+      run: runBack,
+      reset: resetBack,
+    } = useProgress({
       to: 1,
       from: 0,
       easing,
@@ -75,6 +84,10 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
       run() {
         runFront()
         runBack()
+      },
+      reset() {
+        resetFront()
+        resetBack()
       },
     }))
 

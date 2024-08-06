@@ -78,5 +78,10 @@ export const useProgress = ({
       progress.value = from
       run.value = true
     },
+    reset: () => {
+      run.value = false
+      progress.value = from
+      runOnUI(initializeGenerator)()
+    },
   }
 }

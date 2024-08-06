@@ -9,6 +9,7 @@ import { c, ac, RGB } from './utils'
 
 export interface FireworkOrchestratorRef {
   run: () => void
+  reset: () => void
 }
 
 interface FireworkOrchestratorProps {
@@ -141,6 +142,11 @@ export const FireworkOrchestrator = forwardRef<
         ref?.current?.run()
       })
       runOrchestration()
+    },
+    reset() {
+      sparkRefCollection.forEach(ref => {
+        ref?.current?.reset()
+      })
     },
   }))
 

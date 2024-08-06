@@ -115,6 +115,14 @@ export const Playground = () => {
           }}
           color={'white'}
         />
+        <Button
+          title={'⏮️'}
+          onPress={() => {
+            lineRef.current?.reset()
+            fireworkOchestration.current?.reset()
+          }}
+          color={'white'}
+        />
       </View>
     </>
   )

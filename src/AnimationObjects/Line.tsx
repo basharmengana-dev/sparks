@@ -8,6 +8,7 @@ import { EasingFunction } from '../AnimationCore/utils'
 
 export interface LineRef {
   run: () => void
+  reset: () => void
 }
 
 interface LineProps {
@@ -38,7 +39,11 @@ export const Line = forwardRef<LineRef, LineProps>(
     },
     ref,
   ) => {
-    const { progress: progressFront, run } = useProgress({
+    const {
+      progress: progressFront,
+      run,
+      reset,
+    } = useProgress({
       to: 1,
       from: 0,
       easing,
@@ -50,6 +55,7 @@ export const Line = forwardRef<LineRef, LineProps>(
 
     useImperativeHandle(ref, () => ({
       run,
+      reset,
     }))
 
     return (
