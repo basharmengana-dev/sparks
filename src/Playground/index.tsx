@@ -50,12 +50,16 @@ export const Playground = () => {
         <Line
           points={createLineWithOrigin(
             add(grid.getBottomCenter(), { x: 0, y: 5 }),
-            { x: 0, y: 20 },
+            { x: 2, y: 10 },
+            { x: -2, y: 15 },
+            { x: -3, y: 10 },
+            { x: 0, y: 10 },
+            { x: 3, y: 20 },
           )}
           colorsWithBreakpoints={[
             { breakpoint: 0, color: c(0.0, 0.0, 1.0, 1.0) },
-            { breakpoint: 0.5, color: c(0.0, 0.8, 0.7, 0.7) },
-            { breakpoint: 1, color: c(0.0, 0.8, 0.7, 0.0) },
+            { breakpoint: 0.5, color: c(0.0, 0.8, 0.7, 1.0) },
+            { breakpoint: 1, color: c(0.0, 0.8, 0.7, 1.0) },
           ]}
           strokeWidth={2}
           grid={grid}

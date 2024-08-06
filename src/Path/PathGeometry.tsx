@@ -4,7 +4,7 @@ import type {
   SkPoint,
 } from '@shopify/react-native-skia'
 import { Skia } from '@shopify/react-native-skia'
-import { line, curveCatmullRom } from 'd3-shape'
+import { line, curveNatural } from 'd3-shape'
 
 export class PathGeometry {
   private totalLength = 0
@@ -200,7 +200,7 @@ export class PathGeometry {
     const lineGenerator = line<SkPoint>()
       .x(d => d.x)
       .y(d => d.y)
-      .curve(curveCatmullRom)
+      .curve(curveNatural)
 
     const pathData = lineGenerator(newPoints)
 

@@ -44,7 +44,7 @@ export const Line = forwardRef<LineRef, LineProps>(
       easing,
       duration,
       withDelay,
-      waitUntilRun: false,
+      waitUntilRun: true,
       paused,
     })
 
