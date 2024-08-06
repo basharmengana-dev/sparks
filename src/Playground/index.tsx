@@ -18,6 +18,7 @@ const { width, height } = Dimensions.get('window')
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
+  const [keepTrail, setKeepTrail] = useState(true)
 
   const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
@@ -46,6 +47,7 @@ export const Playground = () => {
           grid={grid}
           paused={paused}
           ref={fireworkOchestration}
+          keepTrail={keepTrail}
         />
         <Line
           points={createLineWithOrigin(
@@ -120,6 +122,13 @@ export const Playground = () => {
           onPress={() => {
             lineRef.current?.reset()
             fireworkOchestration.current?.reset()
+          }}
+          color={'white'}
+        />
+        <Button
+          title={keepTrail ? '🔴' : '⚪'}
+          onPress={() => {
+            setKeepTrail(!keepTrail)
           }}
           color={'white'}
         />

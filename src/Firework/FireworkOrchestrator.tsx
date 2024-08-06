@@ -15,12 +15,13 @@ export interface FireworkOrchestratorRef {
 interface FireworkOrchestratorProps {
   grid: Grid
   paused: SharedValue<boolean>
+  keepTrail: boolean
 }
 
 export const FireworkOrchestrator = forwardRef<
   FireworkOrchestratorRef,
   FireworkOrchestratorProps
->(({ grid, paused }, ref) => {
+>(({ grid, paused, keepTrail: still }, ref) => {
   const { progress: progressOrchestration, run: runOrchestration } =
     useProgress({
       to: 1,
@@ -113,9 +114,9 @@ export const FireworkOrchestrator = forwardRef<
       [0.6275, 0.1255, 0.9412],
       2000,
       { x: 0, y: 3 },
-      { x: 0, y: 8 },
-      { x: 1, y: 7 },
-      { x: 0, y: 6 },
+      { x: 0, y: 8.5 },
+      { x: 2, y: 7 },
+      { x: 1, y: 5 },
       { x: -1, y: 7 },
       { x: -2, y: 10 },
     ),
@@ -166,7 +167,7 @@ export const FireworkOrchestrator = forwardRef<
         strokeWidth={3}
         progressOrchestration={progressOrchestration}
         startAtprogressOrchestration={0.0}
-        destructAtFrontProgress={0.2}
+        destructAtFrontProgress={still ? 1 : 0.2}
         paused={paused}
         ref={sparkRefCollection[0]}
         grid={grid}
@@ -197,7 +198,7 @@ export const FireworkOrchestrator = forwardRef<
             easing={Easing.out(Easing.ease)}
             duration={spark.duration}
             startAtprogressOrchestration={0.9}
-            destructAtFrontProgress={0.2}
+            destructAtFrontProgress={still ? 1 : 0.2}
             withDelay={900}
             paused={paused}
             ref={sparkRefCollection[index]}
