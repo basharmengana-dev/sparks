@@ -2,8 +2,8 @@ import { frag } from './ShaderLib'
 
 export const shaderSource = frag`
 uniform float u_totalLength;
-uniform float u_points[1000]; // 400 samples * 2 coordinates (x and y)
-uniform float u_distances[500];
+uniform float u_points[400]; // 400 samples * 2 coordinates (x and y)
+uniform float u_distances[200];
 
 uniform float u_searchThreshold;
 
@@ -41,7 +41,7 @@ float getClosestDistance(vec2 pos) {
   float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
   float bestDist = u_distances[0];
 
-  for (int i = 1; i < 500; i++) {
+  for (int i = 1; i < 200; i++) {
     // change here when sample points increase
     vec2 point = vec2(u_points[2 * i], u_points[2 * i + 1]);
     float distSq = distanceSquared(pos, point);

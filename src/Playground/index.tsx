@@ -8,17 +8,20 @@ import {
   useSharedValue,
   runOnJS,
   Easing,
+  withRepeat,
+  withTiming,
 } from 'react-native-reanimated'
 import { c, RGBA } from '../Firework/utils'
 import { Line, LineRef } from '../AnimationObjects/Line'
 import { add, createLineWithOrigin } from '../Grid/utils'
+import { Petal } from '../AnimationObjects/Petal'
 
 const { width, height } = Dimensions.get('window')
 
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
-  const [keepTrail, setKeepTrail] = useState(true)
+  const [keepTrail, setKeepTrail] = useState(false)
 
   const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
@@ -39,6 +42,9 @@ export const Playground = () => {
       runOnJS(setPausedAvatar)(value)
     },
   )
+
+  const progress = useSharedValue(0)
+  progress.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true)
 
   return (
     <>
@@ -63,14 +69,23 @@ export const Playground = () => {
             { breakpoint: 0.5, color: c(0.0, 0.8, 0.7, 1.0) },
             { breakpoint: 1, color: c(0.0, 0.8, 0.7, 1.0) },
           ]}
-          strokeWidth={2}
+          strokeWidth={3}
           grid={grid}
           paused={paused}
           easing={Easing.inOut(Easing.ease)}
-          duration={1000}
+          duration={1500}
           ref={lineRef}
         />
         {grid.generateCircles(gridColor)}
+        <Petal
+          pos={grid.getCenter()}
+          width={5}
+          height={4}
+          grid={grid}
+          startAngle={0}
+          endAngle={90}
+          progress={progress}
+        />
       </Canvas>
       <View
         style={{
