@@ -10,6 +10,10 @@ uniform int numStops;             // Number of active gradient stops
 uniform float progress;           // Progress value for animation (0 to 1)
 
 half4 main(float2 p) {
+    if(progress == 0.0) {
+        return vec4(0.0, 0.0, 0.0, 0.0);
+      }
+    
     // Calculate the total length of the petal along the gradient axis
     float totalLength = distance(start, end);
 

@@ -52,7 +52,7 @@ export const Path = ({
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
-    const numSamples = 200
+    const numSamples = 100
     const points = new Float32Array(numSamples * 2)
     const distances = new Float32Array(numSamples)
 

@@ -8,13 +8,11 @@ import {
   useSharedValue,
   runOnJS,
   Easing,
-  withRepeat,
-  withTiming,
 } from 'react-native-reanimated'
 import { c, RGBA } from '../Firework/utils'
 import { Line, LineRef } from '../AnimationObjects/Line'
 import { add, createLineWithOrigin } from '../Grid/utils'
-import { Petal } from '../AnimationObjects/Petal'
+import { FlowerBud, FlowerBudRef } from '../Flower/FlowerBud'
 
 const { width, height } = Dimensions.get('window')
 
@@ -26,6 +24,7 @@ export const Playground = () => {
   const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
   const lineRef = useRef<LineRef>(null)
+  const flowerRef = useRef<FlowerBudRef>(null)
 
   const grid = new Grid({
     gridWidth: width,
@@ -43,19 +42,10 @@ export const Playground = () => {
     },
   )
 
-  const progress = useSharedValue(0)
-  progress.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true)
-  const gradient = [
-    { color: '#98FF98', pos: 0 }, // Light Mint Green
-    { color: '#B2FFC8', pos: 0.25 }, // Soft Mint Pastel
-    { color: '#D0FFD8', pos: 0.5 }, // Mint Cream
-    { color: '#E0FFE6', pos: 0.75 }, // Pastel Mint
-    { color: '#F0FFF4', pos: 1 }, // Very Pale Mint
-  ]
-
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
+        {grid.generateCircles(gridColor)}
         <FireworkOrchestrator
           grid={grid}
           paused={paused}
@@ -69,7 +59,7 @@ export const Playground = () => {
             { x: -2, y: 15 },
             { x: -3, y: 10 },
             { x: 0, y: 10 },
-            { x: 3, y: 20 },
+            { x: 0, y: 19 },
           )}
           colorsWithBreakpoints={[
             { breakpoint: 0, color: c(0.0, 0.0, 1.0, 1.0) },
@@ -83,16 +73,11 @@ export const Playground = () => {
           duration={1500}
           ref={lineRef}
         />
-        {grid.generateCircles(gridColor)}
-        <Petal
-          pos={grid.getCenter()}
-          width={5}
-          height={4}
+        <FlowerBud
+          origin={grid.getCenter()}
           grid={grid}
-          startAngle={0}
-          endAngle={90}
-          progress={progress}
-          gradient={gradient}
+          paused={paused}
+          ref={flowerRef}
         />
       </Canvas>
       <View
@@ -123,6 +108,13 @@ export const Playground = () => {
           color={'white'}
         />
         <Button
+          title={'🌸'}
+          onPress={() => {
+            flowerRef.current?.run()
+          }}
+          color={'white'}
+        />
+        <Button
           title={'📈'}
           onPress={() => {
             lineRef.current?.run()
@@ -145,6 +137,7 @@ export const Playground = () => {
           onPress={() => {
             lineRef.current?.reset()
             fireworkOchestration.current?.reset()
+            flowerRef.current?.reset()
           }}
           color={'white'}
         />
