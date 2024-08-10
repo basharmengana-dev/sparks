@@ -8,13 +8,16 @@ import {
   vec,
   SkPoint,
   processTransform2d,
+  Shader,
 } from '@shopify/react-native-skia'
 import { Grid } from '../Grid'
-import {
-  useDerivedValue,
-  SharedValue,
-  useAnimatedReaction,
-} from 'react-native-reanimated'
+import { useDerivedValue, SharedValue } from 'react-native-reanimated'
+import { shaderSource } from '../Flower/Shader'
+
+type GradientStop = {
+  color: string
+  pos: number
+}
 
 type PetalProps = {
   pos: SkPoint
@@ -24,6 +27,7 @@ type PetalProps = {
   startAngle: number
   endAngle: number
   progress: SharedValue<number>
+  gradient: GradientStop[]
 }
 
 export const Petal: React.FC<PetalProps> = ({
@@ -34,6 +38,7 @@ export const Petal: React.FC<PetalProps> = ({
   startAngle,
   endAngle,
   progress,
+  gradient,
 }) => {
   const newPos = {
     x: pos.x * grid.cellWidth,
@@ -77,15 +82,30 @@ export const Petal: React.FC<PetalProps> = ({
   const gradientStart = vec(newPos.x, newPos.y - newHeight / 2)
   const gradientEnd = vec(newPos.x + newWidth, newPos.y - newHeight / 2)
 
+  // Extract colors and positions, pad to 10 elements
+  const colors = gradient.map(stop => Skia.Color(stop.color))
+  const positions = gradient.map(stop => stop.pos)
+  const paddedColors = [
+    ...colors,
+    ...Array(10 - colors.length).fill(Skia.Color('black')),
+  ]
+  const paddedPositions = [
+    ...positions,
+    ...Array(10 - positions.length).fill(1),
+  ]
+
+  const uniforms = useDerivedValue(() => ({
+    start: gradientStart,
+    end: gradientEnd,
+    colors: paddedColors,
+    positions: paddedPositions,
+    numStops: gradient.length,
+    progress: progress.value,
+  }))
+
   return (
     <Path path={path} matrix={transform}>
-      <Paint>
-        <LinearGradient
-          start={gradientStart}
-          end={gradientEnd}
-          colors={['#ff0000', '#00ff00']}
-        />
-      </Paint>
+      <Shader source={shaderSource} uniforms={uniforms} />
     </Path>
   )
 }

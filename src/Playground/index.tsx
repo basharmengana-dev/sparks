@@ -45,6 +45,13 @@ export const Playground = () => {
 
   const progress = useSharedValue(0)
   progress.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true)
+  const gradient = [
+    { color: '#98FF98', pos: 0 }, // Light Mint Green
+    { color: '#B2FFC8', pos: 0.25 }, // Soft Mint Pastel
+    { color: '#D0FFD8', pos: 0.5 }, // Mint Cream
+    { color: '#E0FFE6', pos: 0.75 }, // Pastel Mint
+    { color: '#F0FFF4', pos: 1 }, // Very Pale Mint
+  ]
 
   return (
     <>
@@ -85,6 +92,7 @@ export const Playground = () => {
           startAngle={0}
           endAngle={90}
           progress={progress}
+          gradient={gradient}
         />
       </Canvas>
       <View
