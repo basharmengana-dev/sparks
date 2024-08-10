@@ -22,6 +22,8 @@ interface LineProps {
   duration: number
   withDelay?: number
   paused: SharedValue<boolean>
+  progressOrchestration: SharedValue<number>
+  startAtprogressOrchestration: number
   grid: Grid
 }
 
@@ -34,6 +36,8 @@ export const Line = forwardRef<LineRef, LineProps>(
       easing,
       duration,
       withDelay = null,
+      progressOrchestration,
+      startAtprogressOrchestration,
       paused,
       grid,
     },
@@ -49,7 +53,10 @@ export const Line = forwardRef<LineRef, LineProps>(
       easing,
       duration,
       withDelay,
-      waitUntilRun: true,
+      waitUntilProgress: {
+        progress: progressOrchestration,
+        isValue: startAtprogressOrchestration,
+      },
       paused,
     })
 

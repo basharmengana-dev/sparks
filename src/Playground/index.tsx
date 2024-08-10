@@ -7,12 +7,9 @@ import {
   useAnimatedReaction,
   useSharedValue,
   runOnJS,
-  Easing,
 } from 'react-native-reanimated'
-import { c, RGBA } from '../Firework/utils'
-import { Line, LineRef } from '../AnimationObjects/Line'
-import { add, createLineWithOrigin } from '../Grid/utils'
-import { FlowerBud, FlowerBudRef } from '../Flower/FlowerBud'
+import { RGBA } from '../Firework/utils'
+import { FlowerOrchestrator, FlowerOrchestratorRef } from '../Flower/Flower'
 
 const { width, height } = Dimensions.get('window')
 
@@ -23,8 +20,7 @@ export const Playground = () => {
 
   const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
-  const lineRef = useRef<LineRef>(null)
-  const flowerRef = useRef<FlowerBudRef>(null)
+  const flowerOchestration = useRef<FlowerOrchestratorRef>(null)
 
   const grid = new Grid({
     gridWidth: width,
@@ -52,32 +48,10 @@ export const Playground = () => {
           ref={fireworkOchestration}
           keepTrail={keepTrail}
         />
-        <Line
-          points={createLineWithOrigin(
-            add(grid.getBottomCenter(), { x: 0, y: 5 }),
-            { x: 2, y: 10 },
-            { x: -2, y: 15 },
-            { x: -3, y: 10 },
-            { x: 0, y: 10 },
-            { x: 0, y: 19 },
-          )}
-          colorsWithBreakpoints={[
-            { breakpoint: 0, color: c(0.0, 0.0, 1.0, 1.0) },
-            { breakpoint: 0.5, color: c(0.0, 0.8, 0.7, 1.0) },
-            { breakpoint: 1, color: c(0.0, 0.8, 0.7, 1.0) },
-          ]}
-          strokeWidth={3}
+        <FlowerOrchestrator
           grid={grid}
           paused={paused}
-          easing={Easing.inOut(Easing.ease)}
-          duration={1500}
-          ref={lineRef}
-        />
-        <FlowerBud
-          origin={grid.getCenter()}
-          grid={grid}
-          paused={paused}
-          ref={flowerRef}
+          ref={flowerOchestration}
         />
       </Canvas>
       <View
@@ -110,17 +84,11 @@ export const Playground = () => {
         <Button
           title={'🌸'}
           onPress={() => {
-            flowerRef.current?.run()
+            flowerOchestration.current?.run()
           }}
           color={'white'}
         />
-        <Button
-          title={'📈'}
-          onPress={() => {
-            lineRef.current?.run()
-          }}
-          color={'white'}
-        />
+
         <Button
           title={'🔳'}
           onPress={() => {
@@ -135,9 +103,8 @@ export const Playground = () => {
         <Button
           title={'⏮️'}
           onPress={() => {
-            lineRef.current?.reset()
+            flowerOchestration.current?.reset()
             fireworkOchestration.current?.reset()
-            flowerRef.current?.reset()
           }}
           color={'white'}
         />

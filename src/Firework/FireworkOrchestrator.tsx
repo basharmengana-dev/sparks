@@ -1,8 +1,8 @@
 import { useProgress } from '../AnimationCore/useProgress'
 import { Spark, SparkRef } from '../AnimationObjects/Spark'
 import { SkPoint } from '@shopify/react-native-skia'
-import { Easing, SharedValue, useSharedValue } from 'react-native-reanimated'
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { Easing, SharedValue } from 'react-native-reanimated'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { Grid } from '../Grid'
 import { createLineWithOrigin, getLast } from '../Grid/utils'
 import { c, ac, RGB } from './utils'
@@ -22,14 +22,17 @@ export const FireworkOrchestrator = forwardRef<
   FireworkOrchestratorRef,
   FireworkOrchestratorProps
 >(({ grid, paused, keepTrail: still }, ref) => {
-  const { progress: progressOrchestration, run: runOrchestration } =
-    useProgress({
-      to: 1,
-      from: 0,
-      easing: Easing.out(Easing.ease),
-      duration: 1500,
-      paused,
-    })
+  const {
+    progress: progressOrchestration,
+    run: runOrchestration,
+    reset: resetOrchestration,
+  } = useProgress({
+    to: 1,
+    from: 0,
+    easing: Easing.out(Easing.ease),
+    duration: 1500,
+    paused,
+  })
 
   const stem = {
     points: createLineWithOrigin(
@@ -148,6 +151,7 @@ export const FireworkOrchestrator = forwardRef<
       sparkRefCollection.forEach(ref => {
         ref?.current?.reset()
       })
+      resetOrchestration()
     },
   }))
 

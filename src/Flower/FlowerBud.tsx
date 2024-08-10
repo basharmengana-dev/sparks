@@ -1,7 +1,6 @@
-import { Path } from '../Path'
 import { SkPoint } from '@shopify/react-native-skia'
 import { forwardRef, useImperativeHandle } from 'react'
-import { Easing, SharedValue, useSharedValue } from 'react-native-reanimated'
+import { Easing, SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../AnimationCore/useProgress'
 import { Grid } from '../Grid'
 import { Petal } from '../AnimationObjects/Petal'
@@ -14,17 +13,31 @@ export interface FlowerBudRef {
 interface FlowerBudProps {
   origin: SkPoint
   paused: SharedValue<boolean>
+  progressOrchestration: SharedValue<number>
+  startAtprogressOrchestration: number
   grid: Grid
 }
 
 export const FlowerBud = forwardRef<FlowerBudRef, FlowerBudProps>(
-  ({ origin, paused, grid }, ref) => {
+  (
+    {
+      origin,
+      paused,
+      progressOrchestration,
+      startAtprogressOrchestration,
+      grid,
+    },
+    ref,
+  ) => {
     const { progress, run, reset } = useProgress({
-      to: 1,
       from: 0,
+      to: 1,
       easing: Easing.out(Easing.ease),
       duration: 2000,
-      waitUntilRun: true,
+      waitUntilProgress: {
+        progress: progressOrchestration,
+        isValue: startAtprogressOrchestration,
+      },
       paused,
     })
 

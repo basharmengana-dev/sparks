@@ -59,7 +59,6 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
         progress: progressOrchestration,
         isValue: startAtprogressOrchestration,
       },
-      waitUntilRun: false,
       paused,
     })
 
@@ -76,7 +75,6 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
         progress: progressFront,
         isValue: destructAtFrontProgress,
       },
-      waitUntilRun: false,
       paused,
     })
 
