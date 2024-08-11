@@ -50,17 +50,19 @@ export const FlowerOrchestrator = forwardRef<
     },
   }))
 
+  const stemPoints = createLineWithOrigin(
+    add(grid.getBottomCenter(), { x: 0, y: 5 }),
+    { x: 2, y: 10 },
+    { x: -2, y: 15 },
+    { x: -3, y: 10 },
+    { x: 0, y: 10 },
+    { x: 0, y: 19 },
+  )
+
   return (
     <>
       <Line
-        points={createLineWithOrigin(
-          add(grid.getBottomCenter(), { x: 0, y: 5 }),
-          { x: 2, y: 10 },
-          { x: -2, y: 15 },
-          { x: -3, y: 10 },
-          { x: 0, y: 10 },
-          { x: 0, y: 19 },
-        )}
+        points={stemPoints}
         colorsWithBreakpoints={[
           { breakpoint: 0, color: c(0.0, 0.0, 1.0, 1.0) },
           { breakpoint: 0.5, color: c(0.0, 0.8, 0.7, 1.0) },
@@ -76,7 +78,7 @@ export const FlowerOrchestrator = forwardRef<
         ref={lineRef}
       />
       <FlowerBud
-        origin={grid.getCenter()}
+        origin={getLast(stemPoints)}
         grid={grid}
         paused={paused}
         progressOrchestration={progressOrchestration}

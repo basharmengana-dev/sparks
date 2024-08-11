@@ -1,10 +1,7 @@
 import React from 'react'
 import {
   Skia,
-  Canvas,
-  Paint,
   Path,
-  LinearGradient,
   vec,
   SkPoint,
   processTransform2d,
@@ -40,29 +37,37 @@ export const Petal: React.FC<PetalProps> = ({
   progress,
   gradient,
 }) => {
-  const newPos = {
-    x: pos.x * grid.cellWidth,
-    y: grid.gridHeight - pos.y * grid.cellHeight,
-  }
+  const newPos = grid.gridToPixelCoordinates(pos)
 
-  const newWidth = width * grid.cellWidth
-  const newHeight = height * grid.cellHeight
+  const { width: newWidth, height: newHeight } = grid.gridToPixelSize({
+    width,
+    height,
+  })
 
   const path = Skia.Path.Make()
+
+  // Start at the bottom-center of the petal
   path.moveTo(newPos.x, newPos.y - newHeight / 2)
-  path.quadTo(
-    newPos.x + newWidth / 2,
-    newPos.y - newHeight,
-    newPos.x + newWidth,
-    newPos.y - newHeight / 2,
+
+  // First curve: from bottom-center to top-right
+  path.cubicTo(
+    newPos.x + newWidth / 3, // First control point x
+    newPos.y - newHeight * 1.2, // First control point y (less exaggerated)
+    newPos.x + (2 * newWidth) / 3, // Second control point x
+    newPos.y - newHeight * 1.2, // Second control point y (less exaggerated)
+    newPos.x + newWidth, // End point x (right edge)
+    newPos.y - newHeight / 2, // End point y (top-right)
   )
-  path.quadTo(
-    newPos.x + newWidth / 2,
-    newPos.y,
-    newPos.x,
-    newPos.y - newHeight / 2,
+
+  // Second curve: from top-right back to bottom-center
+  path.cubicTo(
+    newPos.x + (2 * newWidth) / 3, // First control point x
+    newPos.y + newHeight * 0.2, // First control point y (less exaggerated)
+    newPos.x + newWidth / 3, // Second control point x
+    newPos.y + newHeight * 0.2, // Second control point y (less exaggerated)
+    newPos.x, // End point x (bottom-center)
+    newPos.y - newHeight / 2, // End point y (bottom-center)
   )
-  path.close()
 
   const transform = useDerivedValue(() => {
     const currentAngle = startAngle + (endAngle - startAngle) * progress.value
@@ -73,6 +78,7 @@ export const Petal: React.FC<PetalProps> = ({
     return processTransform2d([
       { translateX: centerX },
       { translateY: centerY },
+      { translateY: newHeight / 2 },
       { rotate: -angleInRadians },
       { translateX: -centerX },
       { translateY: -centerY },

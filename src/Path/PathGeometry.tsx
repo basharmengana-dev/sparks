@@ -5,28 +5,17 @@ import type {
 } from '@shopify/react-native-skia'
 import { Skia } from '@shopify/react-native-skia'
 import { line, curveNatural } from 'd3-shape'
+import { Grid } from '../Grid'
 
 export class PathGeometry {
   private totalLength = 0
   private contour: SkContourMeasure
   public path: SkPath
 
-  constructor({
-    points,
-    cellWidth,
-    cellHeight,
-    gridHeight,
-  }: {
-    points: SkPoint[]
-    cellWidth: number
-    cellHeight: number
-    gridHeight: number
-  }) {
+  constructor({ points, grid }: { points: SkPoint[]; grid: Grid }) {
     const svg = this.createSmoothSVGPath({
+      grid,
       points,
-      cellWidth,
-      cellHeight,
-      gridHeight,
     })
     const path = Skia.Path.MakeFromSVGString(svg)!
     const it = Skia.ContourMeasureIter(path, false, 1)
@@ -178,24 +167,17 @@ export class PathGeometry {
   }
 
   private createSmoothSVGPath({
-    cellHeight,
-    cellWidth,
     points,
-    gridHeight,
+    grid,
   }: {
-    cellWidth: number
-    cellHeight: number
     points: SkPoint[]
-    gridHeight: number
+    grid: Grid
   }): string {
     if (points.length === 0) {
       return ''
     }
 
-    const newPoints = points.map(p => ({
-      x: p.x * cellWidth,
-      y: gridHeight - p.y * cellHeight,
-    }))
+    const newPoints = points.map(p => grid.gridToPixelCoordinates(p))
 
     const lineGenerator = line<SkPoint>()
       .x(d => d.x)

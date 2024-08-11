@@ -3,15 +3,9 @@ import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
-import {
-  useAnimatedReaction,
-  useSharedValue,
-  runOnJS,
-} from 'react-native-reanimated'
+import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../Firework/utils'
 import { FlowerOrchestrator, FlowerOrchestratorRef } from '../Flower/Flower'
-
-const { width, height } = Dimensions.get('window')
 
 export const Playground = () => {
   const paused = useSharedValue(false)
@@ -23,20 +17,13 @@ export const Playground = () => {
   const flowerOchestration = useRef<FlowerOrchestratorRef>(null)
 
   const grid = new Grid({
-    gridWidth: width,
-    gridHeight: height,
-    cellWidth: 20,
-    cellHeight: 20,
+    gridWidth: 100, // 100% of screen width
+    gridHeight: 100,
+    cellWidth: 4, // Each cell is 10% of screen width
+    cellHeight: 2, // Each cell is 10% of screen height
     color: 'chartreuse',
     radius: 1,
   })
-
-  useAnimatedReaction(
-    () => paused.value,
-    value => {
-      runOnJS(setPausedAvatar)(value)
-    },
-  )
 
   return (
     <>

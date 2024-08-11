@@ -1,4 +1,5 @@
 import { SkPoint } from '@shopify/react-native-skia'
+import { Dimensions } from 'react-native'
 
 export const createLineWithOrigin = (...points: SkPoint[]): SkPoint[] => {
   if (points.length === 0) return []
@@ -26,3 +27,11 @@ export const add = (a: SkPoint, b: SkPoint): SkPoint => ({
   x: a.x + b.x,
   y: a.y + b.y,
 })
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
+
+export const widthPercentageToDP = (widthPercent: number) =>
+  (screenWidth * widthPercent) / 100
+
+export const heightPercentageToDP = (heightPercent: number) =>
+  (screenHeight * heightPercent) / 100

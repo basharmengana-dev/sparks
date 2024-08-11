@@ -3,12 +3,11 @@ import { Path as SkiaPath, Shader, SkPoint } from '@shopify/react-native-skia'
 import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
+import { Grid } from '../Grid'
 
 export const Path = ({
   points,
-  cellHeight,
-  cellWidth,
-  gridHeight,
+  grid,
   maxIntersectionsAllowed,
   strokeWidth,
   progressFront,
@@ -17,9 +16,7 @@ export const Path = ({
   colorBreakpoints,
 }: {
   points: SkPoint[]
-  cellWidth: number
-  cellHeight: number
-  gridHeight: number
+  grid: Grid
   maxIntersectionsAllowed: number
   strokeWidth: number
   progressFront: SharedValue<number>
@@ -31,11 +28,9 @@ export const Path = ({
     () =>
       new PathGeometry({
         points,
-        cellWidth,
-        cellHeight,
-        gridHeight,
+        grid,
       }),
-    [points, cellWidth, cellHeight],
+    [points, grid],
   )
 
   const {

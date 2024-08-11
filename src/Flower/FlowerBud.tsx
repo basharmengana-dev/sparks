@@ -58,7 +58,7 @@ export const FlowerBud = forwardRef<FlowerBudRef, FlowerBudProps>(
       <Petal
         pos={origin}
         width={5}
-        height={4}
+        height={2}
         grid={grid}
         startAngle={0}
         endAngle={90}

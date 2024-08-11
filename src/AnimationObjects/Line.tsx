@@ -68,9 +68,7 @@ export const Line = forwardRef<LineRef, LineProps>(
     return (
       <Path
         points={points}
-        cellHeight={grid.cellHeight}
-        cellWidth={grid.cellWidth}
-        gridHeight={grid.gridHeight}
+        grid={grid}
         maxIntersectionsAllowed={2}
         strokeWidth={strokeWidth}
         colorBreakpoints={colorsWithBreakpoints}

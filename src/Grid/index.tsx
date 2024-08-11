@@ -1,9 +1,7 @@
-import { Dimensions } from 'react-native'
 import { Circle } from '@shopify/react-native-skia'
 import { SharedValue } from 'react-native-reanimated'
 import { RGBA } from '../Firework/utils'
-
-const { width, height } = Dimensions.get('window')
+import { heightPercentageToDP, widthPercentageToDP } from './utils'
 
 export type GridOptions = {
   gridWidth: number
@@ -29,22 +27,36 @@ export class Grid {
     color = 'white',
     radius = 2,
   }: GridOptions) {
-    this.gridWidth = gridWidth
-    this.gridHeight = gridHeight
-    this.cellWidth = cellWidth
-    this.cellHeight = cellHeight
+    this.gridWidth = widthPercentageToDP(gridWidth)
+    this.gridHeight = heightPercentageToDP(gridHeight)
+    this.cellWidth = widthPercentageToDP(cellWidth)
+    this.cellHeight = heightPercentageToDP(cellHeight)
     this.radius = radius
+  }
+
+  calculatePosition(xRatio: number, yRatio: number) {
+    return { x: this.gridWidth * xRatio, y: this.gridHeight * yRatio }
   }
 
   convertToGridCoordinates(x: number, y: number) {
     return {
-      x: Math.ceil(x / this.cellWidth),
-      y: Math.ceil((this.gridHeight - y) / this.cellHeight),
+      x: Math.round(x / this.cellWidth),
+      y: Math.round((this.gridHeight - y) / this.cellHeight),
     }
   }
 
-  calculatePosition(xRatio: number, yRatio: number) {
-    return { x: width * xRatio, y: height * yRatio }
+  public gridToPixelSize(size: { width: number; height: number }) {
+    return {
+      width: size.width * this.cellWidth,
+      height: size.height * this.cellHeight,
+    }
+  }
+
+  public gridToPixelCoordinates(point: { x: number; y: number }) {
+    return {
+      x: point.x * this.cellWidth,
+      y: this.gridHeight - point.y * this.cellHeight,
+    }
   }
 
   getBottomCenter() {
@@ -77,17 +89,16 @@ export class Grid {
     return this.convertToGridCoordinates(pos.x, pos.y)
   }
 
-  // Method to generate grid circles
   generateCircles(color: SharedValue<RGBA>) {
-    const gridColumns = Math.ceil(this.gridWidth / this.cellWidth)
-    const gridRows = Math.ceil(this.gridHeight / this.cellHeight)
+    const gridColumns = this.gridWidth / this.cellWidth
+    const gridRows = this.gridHeight / this.cellHeight
 
     const circles = []
 
-    for (let i = 0; i < gridColumns; i++) {
+    for (let i = 0; i <= gridColumns; i++) {
       for (let j = 0; j < gridRows; j++) {
-        const cx = i * this.cellWidth
-        const cy = this.gridHeight - j * this.cellHeight
+        const gridPosition = { x: i, y: j }
+        const { x: cx, y: cy } = this.gridToPixelCoordinates(gridPosition)
 
         circles.push(
           <Circle
