@@ -47,16 +47,58 @@ export const Path = ({
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
-    const numSamples = 100
-    const points = new Float32Array(numSamples * 2)
-    const distances = new Float32Array(numSamples)
+    // Define fixed total number of points and extra points for intersections
+    const totalSamples = 100
+    const extraSamples = 50
+    const points = new Float32Array((totalSamples + extraSamples) * 2)
+    const distances = new Float32Array(totalSamples + extraSamples)
 
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / (numSamples - 1)
+    // Initial sampling and intersection detection
+    for (let i = 0; i < totalSamples; i++) {
+      const t = i / (totalSamples - 1)
       const point = preparedPath.getPointAtLength(t * totalLength)
       points[i * 2] = point.x
       points[i * 2 + 1] = point.y
       distances[i] = t * totalLength
+    }
+
+    const intersections = preparedPath.findIntersections(
+      points,
+      distances,
+      strokeWidth,
+      maxIntersectionsAllowed,
+    )
+
+    // Distribute extra samples around intersections
+    if (intersections.length > 0) {
+      const extraSamplesPerIntersection = Math.floor(
+        extraSamples / intersections.length,
+      )
+      let extraSampleIndex = totalSamples
+
+      intersections.forEach(intersection => {
+        const intersectionT = intersection / totalLength
+
+        for (let i = 0; i < extraSamplesPerIntersection; i++) {
+          const t = intersectionT + (Math.random() - 0.5) * (1 / totalSamples) // Slight variation around the intersection
+          const point = preparedPath.getPointAtLength(t * totalLength)
+          points[extraSampleIndex * 2] = point.x
+          points[extraSampleIndex * 2 + 1] = point.y
+          distances[extraSampleIndex] = t * totalLength
+          extraSampleIndex++
+        }
+      })
+
+      // If there's any leftover samples, distribute them evenly across all intersections
+      for (let i = 0; i < extraSamples % intersections.length; i++) {
+        const intersectionT = intersections[i] / totalLength
+        const t = intersectionT + (Math.random() - 0.5) * (1 / totalSamples)
+        const point = preparedPath.getPointAtLength(t * totalLength)
+        points[extraSampleIndex * 2] = point.x
+        points[extraSampleIndex * 2 + 1] = point.y
+        distances[extraSampleIndex] = t * totalLength
+        extraSampleIndex++
+      }
     }
 
     const flattenedPoints = Array.from(points)
@@ -75,13 +117,6 @@ export const Path = ({
       colors[index * 4 + 2] = bp.color[2]
       colors[index * 4 + 3] = bp.color[3]
     })
-
-    const intersections = preparedPath.findIntersections(
-      points,
-      distances,
-      strokeWidth,
-      maxIntersectionsAllowed,
-    )
 
     return {
       flattenedPoints,
