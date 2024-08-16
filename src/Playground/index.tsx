@@ -5,6 +5,7 @@ import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../Firework/utils'
+import { FlowerOrchestrator, FlowerOrchestratorRef } from '../Flower/Flower'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
@@ -13,6 +14,7 @@ export const Playground = () => {
 
   const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
+  const flowerOchestration = useRef<FlowerOrchestratorRef>(null)
 
   const grid = new Grid({
     gridWidth: 100, // 100% of screen width
@@ -32,6 +34,11 @@ export const Playground = () => {
           paused={paused}
           ref={fireworkOchestration}
           keepTrail={keepTrail}
+        />
+        <FlowerOrchestrator
+          grid={grid}
+          paused={paused}
+          ref={flowerOchestration}
         />
       </Canvas>
       <View
@@ -62,6 +69,14 @@ export const Playground = () => {
           color={'white'}
         />
         <Button
+          title={'🌸'}
+          onPress={() => {
+            flowerOchestration.current?.run()
+          }}
+          color={'white'}
+        />
+
+        <Button
           title={'🔳'}
           onPress={() => {
             if (gridColor.value[3] === 1) {
@@ -75,6 +90,7 @@ export const Playground = () => {
         <Button
           title={'⏮️'}
           onPress={() => {
+            flowerOchestration.current?.reset()
             fireworkOchestration.current?.reset()
           }}
           color={'white'}
