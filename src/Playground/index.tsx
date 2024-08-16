@@ -1,20 +1,17 @@
-import { Button, Dimensions, View } from 'react-native'
+import { Button, View } from 'react-native'
 import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../Firework/utils'
-import { FlowerOrchestrator, FlowerOrchestratorRef } from '../Flower/Flower'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
   const [keepTrail, setKeepTrail] = useState(false)
 
-  const [pausedAvatar, setPausedAvatar] = useState(false)
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
-  const flowerOchestration = useRef<FlowerOrchestratorRef>(null)
 
   const grid = new Grid({
     gridWidth: 100, // 100% of screen width
@@ -35,11 +32,6 @@ export const Playground = () => {
           ref={fireworkOchestration}
           keepTrail={keepTrail}
         />
-        <FlowerOrchestrator
-          grid={grid}
-          paused={paused}
-          ref={flowerOchestration}
-        />
       </Canvas>
       <View
         style={{
@@ -54,7 +46,7 @@ export const Playground = () => {
           columnGap: 10,
         }}>
         <Button
-          title={pausedAvatar ? '▶️' : '⏸️'}
+          title={'⏸️'}
           onPress={() => {
             'worklet'
             paused.value = !paused.value
@@ -68,14 +60,6 @@ export const Playground = () => {
           }}
           color={'white'}
         />
-        <Button
-          title={'🌸'}
-          onPress={() => {
-            flowerOchestration.current?.run()
-          }}
-          color={'white'}
-        />
-
         <Button
           title={'🔳'}
           onPress={() => {
