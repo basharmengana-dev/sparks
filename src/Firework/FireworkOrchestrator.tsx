@@ -34,17 +34,6 @@ export const FireworkOrchestrator = forwardRef<
     paused,
   })
 
-  const stem = {
-    points: createLineWithOrigin(
-      grid.getBottomCenter(),
-      { x: 1, y: 7 },
-      { x: 1, y: 14 },
-      { x: -1, y: 20 },
-    ),
-    color: c(1.0, 1.0, 0.878, 0.9),
-    duration: 2000,
-  }
-
   const createSpark = (
     color: RGB,
     duration: number,
@@ -52,12 +41,11 @@ export const FireworkOrchestrator = forwardRef<
   ): { points: SkPoint[]; color: RGB; duration: number } => {
     return {
       color,
-      points: createLineWithOrigin(getLast(stem.points), ...points),
+      points: createLineWithOrigin(grid.getCenter(), ...points),
       duration,
     }
   }
   const sparkCollection = [
-    stem,
     // Purple, right up
     createSpark(
       [0.6275, 0.1255, 0.9412],
@@ -115,7 +103,7 @@ export const FireworkOrchestrator = forwardRef<
     // Loops
     createSpark(
       [0.6275, 0.1255, 0.9412],
-      2000,
+      1500,
       { x: 0, y: 3 },
       { x: 0, y: 8.5 },
       { x: 2, y: 7 },
@@ -125,7 +113,7 @@ export const FireworkOrchestrator = forwardRef<
     ),
     createSpark(
       [0.498, 1.0, 0.0],
-      2000,
+      1500,
       { x: 1, y: 1 },
       { x: 5, y: 4 },
       { x: 6, y: 2 },
@@ -157,28 +145,7 @@ export const FireworkOrchestrator = forwardRef<
 
   return (
     <>
-      <Spark
-        points={sparkCollection[0].points}
-        colorsWithBreakpoints={[
-          { breakpoint: 0.0, color: c(1.0, 1.0, 1.0, 1.0) },
-          { breakpoint: 0.6, color: c(1.0, 1.0, 0.878, 0.9) },
-          { breakpoint: 0.75, color: c(0.596, 0.984, 0.596, 0.8) },
-          { breakpoint: 0.9, color: c(0.866, 0.627, 0.866, 0.7) },
-          { breakpoint: 1, color: c(0.0, 0.0, 0.0, 0.0) },
-        ]}
-        easing={Easing.out(Easing.ease)}
-        duration={sparkCollection[0].duration}
-        strokeWidth={3}
-        progressOrchestration={progressOrchestration}
-        startAtprogressOrchestration={0.0}
-        destructAtFrontProgress={still ? 1 : 0.2}
-        paused={paused}
-        ref={sparkRefCollection[0]}
-        grid={grid}
-      />
       {sparkCollection.map((spark, index) => {
-        if (index === 0) return null // The stem
-
         return (
           <Spark
             key={index}
@@ -197,13 +164,12 @@ export const FireworkOrchestrator = forwardRef<
                 color: ac(0.3, spark.color as RGB),
               },
             ]}
-            strokeWidth={3}
+            strokeWidth={5}
             progressOrchestration={progressOrchestration}
             easing={Easing.out(Easing.ease)}
             duration={spark.duration}
-            startAtprogressOrchestration={0.9}
-            destructAtFrontProgress={still ? 1 : 0.2}
-            withDelay={900}
+            startAtprogressOrchestration={0.0}
+            destructAtFrontProgress={still ? 1 : 0.3}
             paused={paused}
             ref={sparkRefCollection[index]}
             grid={grid}

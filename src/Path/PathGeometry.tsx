@@ -104,12 +104,11 @@ export class PathGeometry {
     const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
     const normalizeDirection = [direction[0] / length, direction[1] / length]
 
-    let adjusmentFactor = 1
-    if (strokeWidth >= 15) {
-      adjusmentFactor = 1.5
+    let expansionFactor = 10
+    if (strokeWidth > 5) {
+      expansionFactor = 15
     }
 
-    const expansionFactor = strokeWidth / adjusmentFactor
     const extendedP1 = [
       intersection[0] - normalizeDirection[0] * length * expansionFactor,
       intersection[1] - normalizeDirection[1] * length * expansionFactor,

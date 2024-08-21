@@ -74,7 +74,6 @@ export const Playground = () => {
         <Button
           title={'⏮️'}
           onPress={() => {
-            flowerOchestration.current?.reset()
             fireworkOchestration.current?.reset()
           }}
           color={'white'}

@@ -2,8 +2,8 @@ import { frag } from './ShaderLib'
 
 export const shaderSource = frag`
 uniform float u_totalLength;
-uniform float u_points[200]; // 400 samples * 2 coordinates (x and y)
-uniform float u_distances[100];
+uniform float u_points[1000]; // 400 samples * 2 coordinates (x and y)
+uniform float u_distances[500];
 
 uniform float u_searchThreshold;
 
@@ -16,8 +16,6 @@ uniform float u_progress_back; // Add uniform for progress
 uniform float u_progress_alpha; // Add uniform for progress
 
 uniform float u_intersections[10]; // progress, p1 (x, y), p2 (x, y) 5 values times amount of intersections allowed
-
-
 uniform float u_strokeWidth;
 
 float distanceSquared(vec2 p1, vec2 p2) {
@@ -34,14 +32,14 @@ float signedDistanceToLineSegment(vec2 p, vec2 a, vec2 b)
 
 bool isPointOnLineSegment(vec2 pos, vec2 A, vec2 B, float strokeWidth) {
   float distance = signedDistanceToLineSegment(pos, A, B);
-  return distance < strokeWidth / 2.0;
+  return distance < strokeWidth / 2.1;
 }
 
 float getClosestDistance(vec2 pos) {
   float minDistSq = distanceSquared(pos, vec2(u_points[0], u_points[1]));
   float bestDist = u_distances[0];
 
-  for (int i = 1; i < 100; i++) {
+  for (int i = 1; i < 500; i++) {
     // change here when sample points increase
     vec2 point = vec2(u_points[2 * i], u_points[2 * i + 1]);
     float distSq = distanceSquared(pos, point);
@@ -88,7 +86,7 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
 
       if (
         isPointOnLineSegment(pos, A, B, u_strokeWidth)
-        && u_progress_front * u_totalLength + distance(A, B) > intersectionDistance + getDistanceAlongLine(pos, A, B)
+        && u_progress_front * u_totalLength + distance(A, B) - (2 * u_strokeWidth) > intersectionDistance + getDistanceAlongLine(pos, A, B)
       ) {
         if (intersectionDistance + getDistanceAlongLine(pos, A, B) >= u_progress_back * u_totalLength + distance(A, B))
         {

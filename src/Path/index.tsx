@@ -47,7 +47,7 @@ export const Path = ({
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
-    const numSamples = 100
+    const numSamples = 500
     const points = new Float32Array(numSamples * 2)
     const distances = new Float32Array(numSamples)
 
@@ -61,7 +61,7 @@ export const Path = ({
 
     const flattenedPoints = Array.from(points)
     const flattenedDistances = Array.from(distances)
-    const searchThreshold = Math.floor(strokeWidth / 2) + 1.02
+    const searchThreshold = Math.floor(strokeWidth / 2) + 0.7
 
     const numMaxBreakpoints = 100
     const numMaxColors = numMaxBreakpoints * 4
