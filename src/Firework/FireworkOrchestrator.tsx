@@ -164,7 +164,7 @@ export const FireworkOrchestrator = forwardRef<
                 color: ac(0.3, spark.color as RGB),
               },
             ]}
-            strokeWidth="stroke/10"
+            strokeWidth="stroke/4"
             progressOrchestration={progressOrchestration}
             easing={Easing.out(Easing.ease)}
             duration={spark.duration}

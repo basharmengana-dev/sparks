@@ -23,6 +23,87 @@ export const getAnimationConfig = (
   strokeWidth: StrokeWidthToken,
 ): AnimationConfig => {
   switch (strokeWidth) {
+    case 'stroke/1':
+      return {
+        tagentExtension: 5,
+        strokeWidth: 1,
+        falloffBack: 0.5,
+        falloffFront: 0.9,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 5,
+      }
+    case 'stroke/2':
+      return {
+        tagentExtension: 5,
+        strokeWidth: 2,
+        falloffBack: 0.5,
+        falloffFront: 0.9,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 5,
+      }
+    case 'stroke/3':
+      return {
+        tagentExtension: 5,
+        strokeWidth: 3,
+        falloffBack: 0.5,
+        falloffFront: 0.9,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 5,
+      }
+    case 'stroke/4':
+      return {
+        tagentExtension: 5,
+        strokeWidth: 4,
+        falloffBack: 0.5,
+        falloffFront: 0.9,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 5,
+      }
+    case 'stroke/5':
+      return {
+        tagentExtension: 15,
+        strokeWidth: 5,
+        falloffBack: 0.5,
+        falloffFront: 1,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 6,
+      }
+    case 'stroke/6':
+      return {
+        tagentExtension: 15,
+        strokeWidth: 6,
+        falloffBack: 0.5,
+        falloffFront: 1,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 11,
+      }
+    case 'stroke/7':
+      return {
+        tagentExtension: 15,
+        strokeWidth: 7,
+        falloffBack: 0.5,
+        falloffFront: 1,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 14,
+      }
+    case 'stroke/8':
+      return {
+        tagentExtension: 15,
+        strokeWidth: 8,
+        falloffBack: 0.5,
+        falloffFront: 1,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 14,
+      }
+    case 'stroke/9':
+      return {
+        tagentExtension: 15,
+        strokeWidth: 9,
+        falloffBack: 0.5,
+        falloffFront: 0.9,
+        searchThreshold: 0.5,
+        tangentStartAdjustment: 10,
+      }
     case 'stroke/10':
       return {
         tagentExtension: 15,
