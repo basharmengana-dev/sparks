@@ -6,6 +6,7 @@ import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { Grid } from '../Grid'
 import { createLineWithOrigin, getLast } from '../Grid/utils'
 import { c, ac, RGB } from './utils'
+import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 
 export interface FireworkOrchestratorRef {
   run: () => void
@@ -16,12 +17,13 @@ interface FireworkOrchestratorProps {
   grid: Grid
   paused: SharedValue<boolean>
   keepTrail: boolean
+  strokeWidth: StrokeWidthToken
 }
 
 export const FireworkOrchestrator = forwardRef<
   FireworkOrchestratorRef,
   FireworkOrchestratorProps
->(({ grid, paused, keepTrail: still }, ref) => {
+>(({ grid, paused, keepTrail: still, strokeWidth }, ref) => {
   const {
     progress: progressOrchestration,
     run: runOrchestration,
@@ -164,10 +166,10 @@ export const FireworkOrchestrator = forwardRef<
                 color: ac(0.3, spark.color as RGB),
               },
             ]}
-            strokeWidth="stroke/4"
+            strokeWidth={strokeWidth}
             progressOrchestration={progressOrchestration}
             easing={Easing.out(Easing.ease)}
-            duration={spark.duration}
+            duration={1700}
             startAtprogressOrchestration={0.0}
             destructAtFrontProgress={still ? 1 : 0.3}
             paused={paused}

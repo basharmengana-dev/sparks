@@ -5,10 +5,12 @@ import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../Firework/utils'
+import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
+  const [strokeWidth, setStrokeWidth] = useState<StrokeWidthToken>('stroke/3')
   const [keepTrail, setKeepTrail] = useState(false)
 
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
@@ -31,6 +33,7 @@ export const Playground = () => {
           paused={paused}
           ref={fireworkOchestration}
           keepTrail={keepTrail}
+          strokeWidth={strokeWidth}
         />
       </Canvas>
       <View
@@ -82,6 +85,38 @@ export const Playground = () => {
           title={keepTrail ? '🔴' : '⚪'}
           onPress={() => {
             setKeepTrail(!keepTrail)
+          }}
+          color={'white'}
+        />
+        <Button
+          title={strokeWidth}
+          onPress={() => {
+            setStrokeWidth((prev: StrokeWidthToken) => {
+              switch (prev) {
+                case 'stroke/1':
+                  return 'stroke/2'
+                case 'stroke/2':
+                  return 'stroke/3'
+                case 'stroke/3':
+                  return 'stroke/4'
+                case 'stroke/4':
+                  return 'stroke/5'
+                case 'stroke/5':
+                  return 'stroke/6'
+                case 'stroke/6':
+                  return 'stroke/7'
+                case 'stroke/7':
+                  return 'stroke/8'
+                case 'stroke/8':
+                  return 'stroke/9'
+                case 'stroke/9':
+                  return 'stroke/10'
+                case 'stroke/10':
+                  return 'stroke/1'
+                default:
+                  return 'stroke/3' // Default case to handle undefined value
+              }
+            })
           }}
           color={'white'}
         />

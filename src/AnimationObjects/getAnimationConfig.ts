@@ -66,7 +66,7 @@ export const getAnimationConfig = (
         falloffBack: 0.5,
         falloffFront: 1,
         searchThreshold: 0.5,
-        tangentStartAdjustment: 6,
+        tangentStartAdjustment: 11,
       }
     case 'stroke/6':
       return {
@@ -114,6 +114,6 @@ export const getAnimationConfig = (
         tangentStartAdjustment: 10,
       }
     default:
-      throw new Error('Invalid stroke width token')
+      throw new Error(`Invalid stroke width token${strokeWidth}`)
   }
 }
