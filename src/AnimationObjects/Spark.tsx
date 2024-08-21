@@ -5,6 +5,7 @@ import { SharedValue } from 'react-native-reanimated'
 import { useProgress } from '../AnimationCore/useProgress'
 import { Grid } from '../Grid'
 import { EasingFunction } from '../AnimationCore/utils'
+import { getAnimationConfig, StrokeWidthToken } from './getAnimationConfig'
 
 export interface SparkRef {
   run: () => void
@@ -17,7 +18,7 @@ interface SparkProps {
     breakpoint: number
     color: number[]
   }[]
-  strokeWidth: number
+  strokeWidth: StrokeWidthToken
   progressOrchestration: SharedValue<number>
   easing: EasingFunction
   duration: number
@@ -94,7 +95,7 @@ export const Spark = forwardRef<SparkRef, SparkProps>(
         points={points}
         grid={grid}
         maxIntersectionsAllowed={2}
-        strokeWidth={strokeWidth}
+        animationConfig={getAnimationConfig(strokeWidth)}
         colorBreakpoints={colorsWithBreakpoints}
         progressFront={progressFront}
         progressBack={progressBack}

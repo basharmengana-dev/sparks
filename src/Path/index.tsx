@@ -4,25 +4,24 @@ import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
 import { shaderSource } from './Shader'
 import { Grid } from '../Grid'
+import { AnimationConfig } from '../AnimationObjects/getAnimationConfig'
 
 export const Path = ({
   points,
   grid,
   maxIntersectionsAllowed,
-  strokeWidth,
   progressFront,
   progressBack,
-  alphaProgress,
   colorBreakpoints,
+  animationConfig,
 }: {
   points: SkPoint[]
   grid: Grid
   maxIntersectionsAllowed: number
-  strokeWidth: number
   progressFront: SharedValue<number>
   progressBack: SharedValue<number>
   colorBreakpoints: { breakpoint: number; color: number[] }[]
-  alphaProgress?: SharedValue<number>
+  animationConfig: AnimationConfig
 }) => {
   const preparedPath = useMemo(
     () =>
@@ -61,7 +60,9 @@ export const Path = ({
 
     const flattenedPoints = Array.from(points)
     const flattenedDistances = Array.from(distances)
-    const searchThreshold = Math.floor(strokeWidth / 2) + 0.7
+    const searchThreshold =
+      Math.floor(animationConfig.strokeWidth / 2) +
+      animationConfig.searchThreshold
 
     const numMaxBreakpoints = 100
     const numMaxColors = numMaxBreakpoints * 4
@@ -76,12 +77,12 @@ export const Path = ({
       colors[index * 4 + 3] = bp.color[3]
     })
 
-    const intersections = preparedPath.findIntersections(
+    const intersections = preparedPath.findIntersections({
       points,
       distances,
-      strokeWidth,
-      maxIntersectionsAllowed,
-    )
+      expectedIntersections: maxIntersectionsAllowed,
+      expansionFactor: animationConfig.tagentExtension,
+    })
 
     return {
       flattenedPoints,
@@ -106,9 +107,11 @@ export const Path = ({
     u_colors: colors,
     u_progress_front: progressFront.value,
     u_progress_back: progressBack.value,
-    u_progress_alpha: alphaProgress?.value ?? 1,
     u_intersections: intersections,
-    u_strokeWidth: strokeWidth,
+    u_strokeWidth: animationConfig.strokeWidth,
+    u_falloff_back: animationConfig.falloffBack,
+    u_falloff_front: animationConfig.falloffFront,
+    u_tangent_start_adjustment: animationConfig.tangentStartAdjustment,
   }))
 
   return (
@@ -116,7 +119,7 @@ export const Path = ({
       <SkiaPath
         path={pathSVG}
         style="stroke"
-        strokeWidth={strokeWidth}
+        strokeWidth={animationConfig.strokeWidth}
         strokeCap="round">
         <Shader source={shaderSource} uniforms={uniforms} />
       </SkiaPath>

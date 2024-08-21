@@ -13,10 +13,12 @@ uniform float u_colors[400]; // 10 breakpoints * 4 (rgba)
 
 uniform float u_progress_front; // Add uniform for progress
 uniform float u_progress_back; // Add uniform for progress
-uniform float u_progress_alpha; // Add uniform for progress
 
 uniform float u_intersections[10]; // progress, p1 (x, y), p2 (x, y) 5 values times amount of intersections allowed
 uniform float u_strokeWidth;
+uniform float u_falloff_back;
+uniform float u_falloff_front;
+uniform float u_tangent_start_adjustment;
 
 float distanceSquared(vec2 p1, vec2 p2) {
   vec2 diff = p1 - p2;
@@ -77,6 +79,7 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
   }
 
   bool returnTransparent = false;
+  bool isIntersecting = false;
   if (distanceAlongPath < u_progress_back * u_totalLength || u_progress_back == 1.0) {
     for (int i = 0; i <= 1; i++) {
       returnTransparent = false;
@@ -86,7 +89,7 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
 
       if (
         isPointOnLineSegment(pos, A, B, u_strokeWidth)
-        && u_progress_front * u_totalLength + distance(A, B) - (2 * u_strokeWidth) > intersectionDistance + getDistanceAlongLine(pos, A, B)
+        && u_progress_front * u_totalLength + distance(A, B) - u_tangent_start_adjustment > intersectionDistance + getDistanceAlongLine(pos, A, B)
       ) {
         if (intersectionDistance + getDistanceAlongLine(pos, A, B) >= u_progress_back * u_totalLength + distance(A, B))
         {
@@ -105,6 +108,13 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
     return vec4(0.0, 0.0, 0.0, 0.0); ;
   }
 
+   // Normalize distanceAlongPath between 0.0 and 1.0
+   float normalizedDistance = (distanceAlongPath / u_totalLength - u_progress_back) / (u_progress_front - u_progress_back);
+    
+   // Calculate tailFactor and frontFactor using linear interpolation
+   float backFactor = clamp(1.0 - (normalizedDistance * u_falloff_back), 0.0, 1.0);
+   float frontFactor = clamp(1.0 - ((1.0 - normalizedDistance) * u_falloff_front), 0.0, 1.0);
+
   for (int i = 0; i < 100; i++) {
     if (i >= u_numBreakpoints - 1 || distanceAlongPath < u_breakpoints[i + 1] * u_totalLength) {
       vec4 color1 = vec4(u_colors[4 * i], u_colors[4 * i + 1], u_colors[4 * i + 2], 1);
@@ -116,7 +126,9 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
       float t = (distanceAlongPath - segmentStart) / (segmentEnd - segmentStart);
       vec4 mixedColor = mix(color1, color2, clamp(t, 0.0, 1.0));
 
-      return applyAlphaToColor(mixedColor, u_progress_alpha);
+     
+      return applyAlphaToColor(mixedColor, backFactor * frontFactor);
+      
     }
   }
   return vec4(0.0); // Default color if no breakpoints are matched

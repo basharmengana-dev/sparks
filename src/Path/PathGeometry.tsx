@@ -65,11 +65,15 @@ export class PathGeometry {
     return intersection
   }
 
-  private findTangent = (
-    points: Float32Array,
-    intersection: Float32Array,
-    strokeWidth: number,
-  ) => {
+  private findTangent = ({
+    points,
+    intersection,
+    expansionFactor,
+  }: {
+    points: Float32Array
+    intersection: Float32Array
+    expansionFactor: number
+  }) => {
     const intersectionX = intersection[0]
     const intersectionY = intersection[1]
     let minDistance = Infinity
@@ -104,11 +108,6 @@ export class PathGeometry {
     const length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2)
     const normalizeDirection = [direction[0] / length, direction[1] / length]
 
-    let expansionFactor = 10
-    if (strokeWidth > 5) {
-      expansionFactor = 15
-    }
-
     const extendedP1 = [
       intersection[0] - normalizeDirection[0] * length * expansionFactor,
       intersection[1] - normalizeDirection[1] * length * expansionFactor,
@@ -121,12 +120,17 @@ export class PathGeometry {
     return { p1: extendedP1, p2: extendedP2 }
   }
 
-  public findIntersections = (
-    points: Float32Array,
-    distances: Float32Array,
-    strokeWidth: number,
-    expectedIntersections: number = 10,
-  ) => {
+  public findIntersections = ({
+    points,
+    distances,
+    expectedIntersections = 10,
+    expansionFactor,
+  }: {
+    points: Float32Array
+    distances: Float32Array
+    expectedIntersections: number
+    expansionFactor: number
+  }) => {
     const intersections = []
 
     // Clone the points and distances arrays to avoid mutating the originals
@@ -143,7 +147,11 @@ export class PathGeometry {
 
       if (intersection[2] === Infinity) break // No more intersections
 
-      const tangent = this.findTangent(currentPoints, intersection, strokeWidth)
+      const tangent = this.findTangent({
+        points: currentPoints,
+        intersection,
+        expansionFactor,
+      })
       intersections.push([intersection[2], ...tangent.p1, ...tangent.p2])
 
       // Remove the points that were part of the intersection
