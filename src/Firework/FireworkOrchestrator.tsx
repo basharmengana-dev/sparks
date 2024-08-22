@@ -4,8 +4,8 @@ import { SkPoint } from '@shopify/react-native-skia'
 import { Easing, SharedValue } from 'react-native-reanimated'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { Grid } from '../Grid'
-import { createLineWithOrigin, getLast } from '../Grid/utils'
-import { c, ac, RGB } from './utils'
+import { createLineWithOrigin } from '../Grid/utils'
+import { ac, RGB } from '../AnimationObjects/utils'
 import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 
 export interface FireworkOrchestratorRef {

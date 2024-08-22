@@ -111,7 +111,7 @@ vec4 getColorForDistanceMix(float distanceAlongPath, vec2 pos) {
    // Normalize distanceAlongPath between 0.0 and 1.0
    float normalizedDistance = (distanceAlongPath / u_totalLength - u_progress_back) / (u_progress_front - u_progress_back);
     
-   // Calculate tailFactor and frontFactor using linear interpolation
+   // Calculate fade backFactor and frontFactor using linear interpolation
    float backFactor = clamp(1.0 - (normalizedDistance * u_falloff_back), 0.0, 1.0);
    float frontFactor = clamp(1.0 - ((1.0 - normalizedDistance) * u_falloff_front), 0.0, 1.0);
 

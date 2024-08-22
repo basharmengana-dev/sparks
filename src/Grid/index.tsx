@@ -1,6 +1,6 @@
 import { Circle } from '@shopify/react-native-skia'
 import { SharedValue } from 'react-native-reanimated'
-import { RGBA } from '../Firework/utils'
+import { RGBA } from '../AnimationObjects/utils'
 import { heightPercentageToDP, widthPercentageToDP } from './utils'
 
 export type GridOptions = {

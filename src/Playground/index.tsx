@@ -4,8 +4,12 @@ import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 import { useSharedValue } from 'react-native-reanimated'
-import { RGBA } from '../Firework/utils'
+import { RGBA } from '../AnimationObjects/utils'
 import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
+import {
+  ConfettiOrchestrator,
+  ConfettiOrchestratorRef,
+} from '../Confetti/ConfettiOrchestration'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
@@ -14,6 +18,7 @@ export const Playground = () => {
   const [keepTrail, setKeepTrail] = useState(false)
 
   const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
+  const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
 
   const grid = new Grid({
     gridWidth: 100, // 100% of screen width
@@ -34,6 +39,14 @@ export const Playground = () => {
           ref={fireworkOchestration}
           keepTrail={keepTrail}
           strokeWidth={strokeWidth}
+        />
+
+        <ConfettiOrchestrator
+          grid={grid}
+          paused={paused}
+          ref={confettiOrchestrator}
+          strokeWidth={strokeWidth}
+          keepTrail={keepTrail}
         />
       </Canvas>
       <View
@@ -59,7 +72,7 @@ export const Playground = () => {
         <Button
           title={'🎊'}
           onPress={() => {
-            fireworkOchestration.current?.run()
+            confettiOrchestrator.current?.run()
           }}
           color={'white'}
         />

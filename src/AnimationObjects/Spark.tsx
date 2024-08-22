@@ -12,7 +12,7 @@ export interface SparkRef {
   reset: () => void
 }
 
-interface SparkProps {
+export interface SparkProps {
   points: SkPoint[]
   colorsWithBreakpoints: {
     breakpoint: number
