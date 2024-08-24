@@ -16,6 +16,7 @@ import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 import { type SparkProps } from '../AnimationObjects/Spark'
 import { ColorSchemes, ac, c } from '../AnimationObjects/utils'
 import React from 'react'
+import { PointsCollection } from './utils'
 
 export interface ConfettiOrchestratorRef {
   run: () => void
@@ -27,65 +28,6 @@ interface ConfettiOrchestratorProps {
   paused: SharedValue<boolean>
   strokeWidth: StrokeWidthToken
   keepTrail: boolean
-}
-
-function createLine({
-  origin,
-  radius,
-  radiusGap,
-  rotateAngle,
-}: {
-  origin: SkPoint
-  radius: number
-  radiusGap: number
-  rotateAngle: number
-}): SkPoint[] {
-  const angleInRadians = (rotateAngle * Math.PI) / 180
-
-  const startPoint: SkPoint = {
-    x: origin.x + radiusGap * Math.cos(angleInRadians),
-    y: origin.y + radiusGap * Math.sin(angleInRadians),
-  }
-
-  const endPoint: SkPoint = {
-    x: startPoint.x + radius * Math.cos(angleInRadians),
-    y: startPoint.y + radius * Math.sin(angleInRadians),
-  }
-
-  const points = Array.from({ length: radius + 1 }, (_, i) => {
-    const t = i / radius
-    return {
-      x: startPoint.x + t * (endPoint.x - startPoint.x),
-      y: startPoint.y + t * (endPoint.y - startPoint.y),
-    }
-  })
-
-  return points
-}
-
-function createLineCollection({
-  origin,
-  radius,
-  radiusGap,
-  lineNumber,
-  lineGapAngle,
-  startAngle = 0,
-}: {
-  origin: SkPoint
-  radius: number
-  radiusGap: number
-  lineNumber: number
-  lineGapAngle: number
-  startAngle?: number
-}): SkPoint[][] {
-  return Array.from({ length: lineNumber }, (_, i) =>
-    createLine({
-      origin,
-      radius,
-      rotateAngle: startAngle + i * lineGapAngle,
-      radiusGap,
-    }),
-  )
 }
 
 export const ConfettiOrchestrator = forwardRef<
@@ -104,13 +46,22 @@ export const ConfettiOrchestrator = forwardRef<
     paused,
   })
 
-  const pointsCollection = createLineCollection({
-    origin: grid.getCenter(),
-    radius: 6,
-    radiusGap: 2,
-    lineNumber: 8,
-    lineGapAngle: 45,
-  })
+  const pointsCollection = new PointsCollection()
+    .addLine({
+      origin: grid.getCenter(),
+      radius: 6,
+      radiusGap: 2,
+      lineNumber: 8,
+      lineGapAngle: 45,
+    })
+    .addLine({
+      origin: grid.getCenter(),
+      radius: 8,
+      radiusGap: 3,
+      lineNumber: 6,
+      lineGapAngle: 60,
+    })
+    .getLines()
 
   const confettiCollection: Pick<
     SparkProps,
@@ -122,7 +73,7 @@ export const ConfettiOrchestrator = forwardRef<
     | 'strokeWidth'
   >[] = useMemo(
     () => [
-      ...pointsCollection.map(points => ({
+      ...pointsCollection.map((points, i) => ({
         points,
         duration: 900,
         colorsWithBreakpoints: ColorSchemes.createPinkColors(),
