@@ -49,40 +49,60 @@ export const ConfettiOrchestrator = forwardRef<
   const pointsCollection = new PointsCollection()
     .addLine({
       origin: grid.getCenter(),
-      radius: 6,
-      radiusGap: 2,
-      lineNumber: 8,
-      lineGapAngle: 45,
+      radius: 2,
+      radiusGap: 1,
+      lineNumber: 3,
+      startAngle: 45,
+      lineGapAngle: 80,
+      strokeWidth,
+      duration: 800,
+      startAtprogressOrchestration: 0,
+      destructAtFrontProgress: still ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createPinkColors(),
     })
     .addLine({
       origin: grid.getCenter(),
-      radius: 8,
-      radiusGap: 3,
-      lineNumber: 6,
-      lineGapAngle: 60,
+      radius: 3,
+      radiusGap: 1,
+      lineNumber: 2,
+      startAngle: 180,
+      lineGapAngle: 180,
+      strokeWidth,
+      duration: 500,
+      startAtprogressOrchestration: 0.15,
+      destructAtFrontProgress: still ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createBlueColors(),
     })
-    .getLines()
+    .addLine({
+      origin: grid.getCenter(),
+      radius: 3.5,
+      radiusGap: 1,
+      lineNumber: 3,
+      startAngle: 70,
+      lineGapAngle: 90,
+      strokeWidth,
+      duration: 600,
+      startAtprogressOrchestration: 0.25,
+      destructAtFrontProgress: still ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createPurpleColors(),
+    })
+    .addLine({
+      origin: grid.getCenter(),
+      radius: 3.5,
+      radiusGap: 1,
+      lineNumber: 5,
+      startAngle: -20,
+      lineGapAngle: -50,
+      strokeWidth,
+      duration: 600,
+      startAtprogressOrchestration: 0.3,
+      destructAtFrontProgress: still ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createYellowColors(),
+    })
 
-  const confettiCollection: Pick<
-    SparkProps,
-    | 'points'
-    | 'duration'
-    | 'colorsWithBreakpoints'
-    | 'startAtprogressOrchestration'
-    | 'destructAtFrontProgress'
-    | 'strokeWidth'
-  >[] = useMemo(
-    () => [
-      ...pointsCollection.map((points, i) => ({
-        points,
-        duration: 900,
-        colorsWithBreakpoints: ColorSchemes.createPinkColors(),
-        startAtprogressOrchestration: 0,
-        destructAtFrontProgress: still ? 1 : 0.4,
-        strokeWidth,
-      })),
-    ],
-    [pointsCollection, still, strokeWidth],
+  const confettiCollection = useMemo(
+    () => pointsCollection.getConfettiConfig(),
+    [pointsCollection],
   )
 
   const maxConfettiCount = 100
@@ -141,7 +161,7 @@ export const ConfettiOrchestrator = forwardRef<
           />
         )
       })}
-      <Circle cx={gridCenter.x} cy={gridCenter.y} r={2} color={'red'} />
+      {/* <Circle cx={gridCenter.x} cy={gridCenter.y} r={2} color={'red'} /> */}
     </>
   )
 })

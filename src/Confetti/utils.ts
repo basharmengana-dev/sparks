@@ -1,6 +1,9 @@
 import { SkPoint } from '@shopify/react-native-skia'
+import { SparkProps } from '../AnimationObjects/Spark'
+import { ColorSchemes } from '../AnimationObjects/utils'
+import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 
-const createLine = ({
+export const createLine = ({
   origin,
   radius,
   radiusGap,
@@ -34,7 +37,7 @@ const createLine = ({
   return points
 }
 
-const createLineCollection = ({
+export const createLineCollection = ({
   origin,
   radius,
   radiusGap,
@@ -60,36 +63,65 @@ const createLineCollection = ({
 }
 
 export class PointsCollection {
-  private lines: SkPoint[][] = []
+  private confettiConfig: Pick<
+    SparkProps,
+    | 'points'
+    | 'duration'
+    | 'colorsWithBreakpoints'
+    | 'startAtprogressOrchestration'
+    | 'destructAtFrontProgress'
+    | 'strokeWidth'
+  >[] = []
 
   addLine({
     origin,
     radius,
     radiusGap,
     lineNumber,
+    startAngle,
     lineGapAngle,
-    startAngle = 0,
+    duration,
+    colorsWithBreakpoints,
+    startAtprogressOrchestration,
+    destructAtFrontProgress,
+    strokeWidth,
   }: {
     origin: SkPoint
     radius: number
     radiusGap: number
     lineNumber: number
+    startAngle: number
     lineGapAngle: number
-    startAngle?: number
+    duration: number
+    colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
+    startAtprogressOrchestration: number
+    destructAtFrontProgress: number
+    strokeWidth: StrokeWidthToken
   }): PointsCollection {
-    const newLines = Array.from({ length: lineNumber }, (_, i) =>
-      createLine({
-        origin,
-        radius,
-        rotateAngle: startAngle + i * lineGapAngle,
-        radiusGap,
-      }),
+    const newLines = createLineCollection({
+      origin,
+      radius,
+      radiusGap,
+      lineNumber,
+      lineGapAngle,
+      startAngle,
+    })
+
+    this.confettiConfig.push(
+      ...newLines.map(points => ({
+        points,
+        duration,
+        colorsWithBreakpoints,
+        startAtprogressOrchestration,
+        destructAtFrontProgress,
+        strokeWidth,
+      })),
     )
-    this.lines.push(...newLines)
+
     return this
   }
 
-  getLines() {
-    return this.lines
+  getConfettiConfig() {
+    return this.confettiConfig
   }
 }
