@@ -90,7 +90,7 @@ export const Playground = () => {
         <Button
           title={'⏮️'}
           onPress={() => {
-            fireworkOchestration.current?.reset()
+            confettiOrchestrator.current?.reset()
           }}
           color={'white'}
         />
