@@ -81,7 +81,7 @@ export const Path = ({
       points,
       distances,
       expectedIntersections: maxIntersectionsAllowed,
-      tagentExtension: animationConfig.tagentExtension,
+      tangentExtension: animationConfig.tangentExtension,
     })
 
     return {

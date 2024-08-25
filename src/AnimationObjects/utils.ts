@@ -176,7 +176,7 @@ class ColorSchemeGenerator {
     )
   }
 
-  static createSunsetColors(n = ColorSchemeGenerator.defaultBreakpoints) {
+  static createAutumnColors(n = ColorSchemeGenerator.defaultBreakpoints) {
     return ColorSchemeGenerator.acs(
       Array.from({ length: n }, (_, i) => {
         const hue = 0.1 + 0.3 * (1 - i / (n - 1))
@@ -202,5 +202,5 @@ export const ColorSchemes = {
   createPastelColors: ColorSchemeGenerator.createPastelColors,
   createFireColors: ColorSchemeGenerator.createFireColors,
   createOceanColors: ColorSchemeGenerator.createOceanColors,
-  createSunsetColors: ColorSchemeGenerator.createSunsetColors,
+  createSunsetColors: ColorSchemeGenerator.createAutumnColors,
 }

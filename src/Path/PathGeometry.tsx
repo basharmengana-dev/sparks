@@ -68,11 +68,11 @@ export class PathGeometry {
   private findTangent = ({
     points,
     intersection,
-    tagentExtension,
+    tangentExtension,
   }: {
     points: Float32Array
     intersection: Float32Array
-    tagentExtension: number
+    tangentExtension: number
   }) => {
     const intersectionX = intersection[0]
     const intersectionY = intersection[1]
@@ -109,12 +109,12 @@ export class PathGeometry {
     const normalizeDirection = [direction[0] / length, direction[1] / length]
 
     const extendedP1 = [
-      intersection[0] - normalizeDirection[0] * length * tagentExtension,
-      intersection[1] - normalizeDirection[1] * length * tagentExtension,
+      intersection[0] - normalizeDirection[0] * length * tangentExtension,
+      intersection[1] - normalizeDirection[1] * length * tangentExtension,
     ]
     const extendedP2 = [
-      intersection[0] + normalizeDirection[0] * length * tagentExtension,
-      intersection[1] + normalizeDirection[1] * length * tagentExtension,
+      intersection[0] + normalizeDirection[0] * length * tangentExtension,
+      intersection[1] + normalizeDirection[1] * length * tangentExtension,
     ]
 
     return { p1: extendedP1, p2: extendedP2 }
@@ -124,12 +124,12 @@ export class PathGeometry {
     points,
     distances,
     expectedIntersections = 10,
-    tagentExtension,
+    tangentExtension,
   }: {
     points: Float32Array
     distances: Float32Array
     expectedIntersections: number
-    tagentExtension: number
+    tangentExtension: number
   }) => {
     const intersections = []
 
@@ -150,7 +150,7 @@ export class PathGeometry {
       const tangent = this.findTangent({
         points: currentPoints,
         intersection,
-        tagentExtension,
+        tangentExtension,
       })
       intersections.push([intersection[2], ...tangent.p1, ...tangent.p2])
 

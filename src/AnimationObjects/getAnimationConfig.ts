@@ -1,5 +1,5 @@
 export type AnimationConfig = {
-  tagentExtension: number
+  tangentExtension: number
   strokeWidth: number
   falloffBack: number
   falloffFront: number
@@ -25,7 +25,7 @@ export const getAnimationConfig = (
   switch (strokeWidth) {
     case 'stroke/1':
       return {
-        tagentExtension: 5,
+        tangentExtension: 5,
         strokeWidth: 1,
         falloffBack: 0.5,
         falloffFront: 0.9,
@@ -34,7 +34,7 @@ export const getAnimationConfig = (
       }
     case 'stroke/2':
       return {
-        tagentExtension: 5,
+        tangentExtension: 5,
         strokeWidth: 2,
         falloffBack: 0.5,
         falloffFront: 0.9,
@@ -43,7 +43,7 @@ export const getAnimationConfig = (
       }
     case 'stroke/3':
       return {
-        tagentExtension: 5,
+        tangentExtension: 6.5,
         strokeWidth: 3,
         falloffBack: 0.5,
         falloffFront: 0.9,
@@ -52,7 +52,7 @@ export const getAnimationConfig = (
       }
     case 'stroke/4':
       return {
-        tagentExtension: 5,
+        tangentExtension: 20,
         strokeWidth: 4,
         falloffBack: 0.5,
         falloffFront: 0.9,
@@ -61,43 +61,43 @@ export const getAnimationConfig = (
       }
     case 'stroke/5':
       return {
-        tagentExtension: 15,
+        tangentExtension: 22,
         strokeWidth: 5,
         falloffBack: 0.5,
         falloffFront: 1,
         searchThreshold: 0.5,
-        tangentStartAdjustment: 11,
+        tangentStartAdjustment: 5,
       }
     case 'stroke/6':
       return {
-        tagentExtension: 15,
+        tangentExtension: 22,
         strokeWidth: 6,
         falloffBack: 0.5,
         falloffFront: 1,
         searchThreshold: 0.5,
-        tangentStartAdjustment: 11,
+        tangentStartAdjustment: 5,
       }
     case 'stroke/7':
       return {
-        tagentExtension: 15,
+        tangentExtension: 22.5,
         strokeWidth: 7,
         falloffBack: 0.5,
         falloffFront: 1,
         searchThreshold: 0.5,
-        tangentStartAdjustment: 14,
+        tangentStartAdjustment: 5,
       }
     case 'stroke/8':
       return {
-        tagentExtension: 15,
+        tangentExtension: 22.5,
         strokeWidth: 8,
         falloffBack: 0.5,
         falloffFront: 1,
         searchThreshold: 0.5,
-        tangentStartAdjustment: 14,
+        tangentStartAdjustment: 5,
       }
     case 'stroke/9':
       return {
-        tagentExtension: 15,
+        tangentExtension: 23.7,
         strokeWidth: 9,
         falloffBack: 0.5,
         falloffFront: 0.9,
@@ -106,12 +106,12 @@ export const getAnimationConfig = (
       }
     case 'stroke/10':
       return {
-        tagentExtension: 15,
+        tangentExtension: 26.4,
         strokeWidth: 10,
         falloffBack: 0.5,
         falloffFront: 0.9,
         searchThreshold: 0.5,
-        tangentStartAdjustment: 10,
+        tangentStartAdjustment: 5,
       }
     default:
       throw new Error(`Invalid stroke width token${strokeWidth}`)
