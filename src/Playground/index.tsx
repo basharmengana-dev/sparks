@@ -4,12 +4,14 @@ import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 import { useSharedValue } from 'react-native-reanimated'
-import { RGBA } from '../AnimationObjects/utils'
+import { ColorSchemes, RGBA } from '../AnimationObjects/utils'
 import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 import {
+  Confetti,
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
+import { line } from 'd3-shape'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
@@ -21,13 +23,178 @@ export const Playground = () => {
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
 
   const grid = new Grid({
-    gridWidth: 100, // 100% of screen width
+    gridWidth: 100,
     gridHeight: 100,
-    cellWidth: 4, // Each cell is 10% of screen width
-    cellHeight: 2, // Each cell is 10% of screen height
+    cellWidth: 4,
+    cellHeight: 2,
     color: 'chartreuse',
     radius: 1,
   })
+
+  const confetti: Confetti[] = [
+    {
+      origin: grid.getCenter(),
+      radius: 2,
+      radiusGap: 1,
+      lineNumber: 3,
+      startAngle: 45,
+      lineGapAngle: 80,
+      strokeWidth: 'stroke/2',
+      duration: 800,
+      startAtprogressOrchestration: 0,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createPinkColors(),
+      lineType: 'line',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 3,
+      radiusGap: 1,
+      lineNumber: 2,
+      startAngle: 180,
+      lineGapAngle: 180,
+      strokeWidth: 'stroke/3',
+      duration: 500,
+      startAtprogressOrchestration: 0.15,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createBlueColors(),
+      lineType: 'line',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 3.5,
+      radiusGap: 2,
+      lineNumber: 3,
+      startAngle: 70,
+      lineGapAngle: 90,
+      strokeWidth: 'stroke/2',
+      duration: 600,
+      startAtprogressOrchestration: 0.25,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createPurpleColors(),
+      lineType: 'line',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 3.5,
+      radiusGap: 1.5,
+      lineNumber: 5,
+      startAngle: -20,
+      lineGapAngle: -50,
+      strokeWidth: 'stroke/4',
+      duration: 600,
+      startAtprogressOrchestration: 0.3,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createYellowColors(),
+      lineType: 'line',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 4,
+      radiusGap: 1,
+      rotateAngle: 30,
+      loopFacing: 'up',
+      numberOfLoops: 1,
+      loopOffsetSteps: 1,
+      loopStart: 0.4,
+      strokeWidth: 'stroke/2',
+      duration: 700,
+      colorsWithBreakpoints: ColorSchemes.createRedColors(),
+      startAtprogressOrchestration: 0.1,
+      destructAtFrontProgress: keepTrail ? 1 : 0.3,
+      lineType: 'loop',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 5,
+      radiusGap: 1.5,
+      rotateAngle: -100,
+      loopFacing: 'down',
+      numberOfLoops: 1,
+      loopOffsetSteps: 1.3,
+      strokeWidth: 'stroke/3',
+      loopStart: 0.6,
+      duration: 700,
+      colorsWithBreakpoints: ColorSchemes.createSunsetColors(),
+      startAtprogressOrchestration: 0.0,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      lineType: 'loop',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 6,
+      radiusGap: 1.25,
+      rotateAngle: 100,
+      loopFacing: 'up',
+      numberOfLoops: 1,
+      loopOffsetSteps: 2,
+      strokeWidth: 'stroke/3',
+      loopStart: 0.3,
+      duration: 700,
+      colorsWithBreakpoints: ColorSchemes.createOceanColors(),
+      startAtprogressOrchestration: 0.0,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      lineType: 'loop',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 5,
+      radiusGap: 1.5,
+      rotateAngle: 310,
+      loopFacing: 'up',
+      numberOfLoops: 1,
+      loopOffsetSteps: 1,
+      strokeWidth: 'stroke/1',
+      loopStart: 0.2,
+      duration: 800,
+      colorsWithBreakpoints: ColorSchemes.createGreenColors(),
+      startAtprogressOrchestration: 0.0,
+      destructAtFrontProgress: keepTrail ? 1 : 0.5,
+      lineType: 'loop',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 1,
+      radiusGap: 4,
+      lineNumber: 7,
+      startAngle: 10,
+      lineGapAngle: 50,
+      strokeWidth: 'stroke/3',
+      duration: 500,
+      startAtprogressOrchestration: 0.9,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createPastelColors(),
+      lineType: 'line',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 1,
+      radiusGap: 3.8,
+      lineNumber: 7,
+      startAngle: 30,
+      lineGapAngle: 50,
+      strokeWidth: 'stroke/3',
+      duration: 500,
+      startAtprogressOrchestration: 0.9,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createTealColors(),
+      lineType: 'line',
+    },
+    {
+      origin: grid.getCenter(),
+      radius: 1,
+      radiusGap: 2.5,
+      lineNumber: 7,
+      startAngle: 40,
+      lineGapAngle: 50,
+      strokeWidth: 'stroke/2',
+      duration: 500,
+      startAtprogressOrchestration: 0.9,
+      destructAtFrontProgress: keepTrail ? 1 : 0.4,
+      colorsWithBreakpoints: ColorSchemes.createRedColors(),
+      lineType: 'line',
+    },
+  ]
 
   return (
     <>
@@ -42,11 +209,10 @@ export const Playground = () => {
         />
 
         <ConfettiOrchestrator
+          confetti={confetti}
           grid={grid}
           paused={paused}
           ref={confettiOrchestrator}
-          strokeWidth={strokeWidth}
-          keepTrail={keepTrail}
         />
       </Canvas>
       <View
@@ -98,38 +264,6 @@ export const Playground = () => {
           title={keepTrail ? '🔴' : '⚪'}
           onPress={() => {
             setKeepTrail(!keepTrail)
-          }}
-          color={'white'}
-        />
-        <Button
-          title={strokeWidth}
-          onPress={() => {
-            setStrokeWidth((prev: StrokeWidthToken) => {
-              switch (prev) {
-                case 'stroke/1':
-                  return 'stroke/2'
-                case 'stroke/2':
-                  return 'stroke/3'
-                case 'stroke/3':
-                  return 'stroke/4'
-                case 'stroke/4':
-                  return 'stroke/5'
-                case 'stroke/5':
-                  return 'stroke/6'
-                case 'stroke/6':
-                  return 'stroke/7'
-                case 'stroke/7':
-                  return 'stroke/8'
-                case 'stroke/8':
-                  return 'stroke/9'
-                case 'stroke/9':
-                  return 'stroke/10'
-                case 'stroke/10':
-                  return 'stroke/1'
-                default:
-                  return 'stroke/3' // Default case to handle undefined value
-              }
-            })
           }}
           color={'white'}
         />

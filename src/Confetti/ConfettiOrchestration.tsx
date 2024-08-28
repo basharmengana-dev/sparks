@@ -16,24 +16,31 @@ import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 import { type SparkProps } from '../AnimationObjects/Spark'
 import { ColorSchemes, ac, c } from '../AnimationObjects/utils'
 import React from 'react'
-import { PointsCollection } from './utils'
+import {
+  PointsCollection,
+  ConfettiLineConfig,
+  ConfettiLoopConfig,
+} from './utils'
 
 export interface ConfettiOrchestratorRef {
   run: () => void
   reset: () => void
 }
 
+export type Confetti =
+  | (ConfettiLineConfig & { lineType: 'line' })
+  | (ConfettiLoopConfig & { lineType: 'loop' })
+
 interface ConfettiOrchestratorProps {
+  confetti: Confetti[]
   grid: Grid
   paused: SharedValue<boolean>
-  strokeWidth: StrokeWidthToken
-  keepTrail: boolean
 }
 
 export const ConfettiOrchestrator = forwardRef<
   ConfettiOrchestratorRef,
   ConfettiOrchestratorProps
->(({ grid, paused, keepTrail: still, strokeWidth }, ref) => {
+>(({ confetti = [], grid, paused }, ref) => {
   const {
     progress: progressOrchestration,
     run: runOrchestration,
@@ -47,157 +54,14 @@ export const ConfettiOrchestrator = forwardRef<
   })
 
   const pointsCollection = new PointsCollection()
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 2,
-      radiusGap: 1,
-      lineNumber: 3,
-      startAngle: 45,
-      lineGapAngle: 80,
-      strokeWidth: 'stroke/2',
-      duration: 800,
-      startAtprogressOrchestration: 0,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createPinkColors(),
-    })
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 3,
-      radiusGap: 1,
-      lineNumber: 2,
-      startAngle: 180,
-      lineGapAngle: 180,
-      strokeWidth: 'stroke/3',
-      duration: 500,
-      startAtprogressOrchestration: 0.15,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createBlueColors(),
-    })
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 3.5,
-      radiusGap: 2,
-      lineNumber: 3,
-      startAngle: 70,
-      lineGapAngle: 90,
-      strokeWidth: 'stroke/2',
-      duration: 600,
-      startAtprogressOrchestration: 0.25,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createPurpleColors(),
-    })
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 3.5,
-      radiusGap: 1.5,
-      lineNumber: 5,
-      startAngle: -20,
-      lineGapAngle: -50,
-      strokeWidth: 'stroke/4',
-      duration: 600,
-      startAtprogressOrchestration: 0.3,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createYellowColors(),
-    })
-    .addLoopedLine({
-      origin: grid.getCenter(),
-      radius: 4,
-      radiusGap: 1,
-      rotateAngle: 30,
-      loopFacing: 'up',
-      numberOfLoops: 1,
-      loopOffsetSteps: 1,
-      loopStart: 0.4,
-      strokeWidth: 'stroke/2',
-      duration: 700,
-      colorsWithBreakpoints: ColorSchemes.createRedColors(),
-      startAtprogressOrchestration: 0.1,
-      destructAtFrontProgress: still ? 1 : 0.3,
-    })
-    .addLoopedLine({
-      origin: grid.getCenter(),
-      radius: 5,
-      radiusGap: 1.5,
-      rotateAngle: -100,
-      loopFacing: 'down',
-      numberOfLoops: 1,
-      loopOffsetSteps: 1.3,
-      strokeWidth: 'stroke/3',
-      loopStart: 0.6,
-      duration: 700,
-      colorsWithBreakpoints: ColorSchemes.createSunsetColors(),
-      startAtprogressOrchestration: 0.0,
-      destructAtFrontProgress: still ? 1 : 0.4,
-    })
-    .addLoopedLine({
-      origin: grid.getCenter(),
-      radius: 6,
-      radiusGap: 1.25,
-      rotateAngle: 100,
-      loopFacing: 'up',
-      numberOfLoops: 1,
-      loopOffsetSteps: 2,
-      strokeWidth: 'stroke/3',
-      loopStart: 0.3,
-      duration: 700,
-      colorsWithBreakpoints: ColorSchemes.createOceanColors(),
-      startAtprogressOrchestration: 0.0,
-      destructAtFrontProgress: still ? 1 : 0.4,
-    })
-    .addLoopedLine({
-      origin: grid.getCenter(),
-      radius: 5,
-      radiusGap: 1.5,
-      rotateAngle: 310,
-      loopFacing: 'up',
-      numberOfLoops: 1,
-      loopOffsetSteps: 1,
-      strokeWidth: 'stroke/1',
-      loopStart: 0.2,
-      duration: 800,
-      colorsWithBreakpoints: ColorSchemes.createGreenColors(),
-      startAtprogressOrchestration: 0.0,
-      destructAtFrontProgress: still ? 1 : 0.5,
-    })
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 1,
-      radiusGap: 4,
-      lineNumber: 7,
-      startAngle: 10,
-      lineGapAngle: 50,
-      strokeWidth: 'stroke/3',
-      duration: 500,
-      startAtprogressOrchestration: 0.9,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createPastelColors(),
-    })
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 1,
-      radiusGap: 3.8,
-      lineNumber: 7,
-      startAngle: 30,
-      lineGapAngle: 50,
-      strokeWidth: 'stroke/3',
-      duration: 500,
-      startAtprogressOrchestration: 0.9,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createTealColors(),
-    })
-    .addLine({
-      origin: grid.getCenter(),
-      radius: 1,
-      radiusGap: 2.5,
-      lineNumber: 7,
-      startAngle: 40,
-      lineGapAngle: 50,
-      strokeWidth: 'stroke/2',
-      duration: 500,
-      startAtprogressOrchestration: 0.9,
-      destructAtFrontProgress: still ? 1 : 0.4,
-      colorsWithBreakpoints: ColorSchemes.createRedColors(),
-    })
+  confetti.forEach(confetti => {
+    if (confetti.lineType === 'line') {
+      pointsCollection.addLine(confetti)
+    }
+    if (confetti.lineType === 'loop') {
+      pointsCollection.addLoopedLine(confetti)
+    }
+  })
 
   const confettiCollection = useMemo(
     () => pointsCollection.getConfettiConfig(),
@@ -239,7 +103,6 @@ export const ConfettiOrchestrator = forwardRef<
     }
   }, [confettiCollection.length, autoDraw])
 
-  const gridCenter = grid.gridToPixelCoordinates(grid.getCenter())
   return (
     <>
       {confettiCollection.map((spark, index) => {
@@ -260,7 +123,6 @@ export const ConfettiOrchestrator = forwardRef<
           />
         )
       })}
-      <Circle cx={gridCenter.x} cy={gridCenter.y} r={2} color={'red'} />
     </>
   )
 })

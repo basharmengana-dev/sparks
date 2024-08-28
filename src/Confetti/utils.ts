@@ -208,16 +208,49 @@ export const createLineCollection = ({
   )
 }
 
+export type ConfettiSparkConfig = Pick<
+  SparkProps,
+  | 'points'
+  | 'duration'
+  | 'colorsWithBreakpoints'
+  | 'startAtprogressOrchestration'
+  | 'destructAtFrontProgress'
+  | 'strokeWidth'
+>
+
+export type ConfettiLineConfig = {
+  origin: SkPoint
+  radius: number
+  radiusGap: number
+  lineNumber: number
+  startAngle: number
+  lineGapAngle: number
+  duration: number
+  colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
+  startAtprogressOrchestration: number
+  destructAtFrontProgress: number
+  strokeWidth: StrokeWidthToken
+}
+
+export type ConfettiLoopConfig = {
+  origin: SkPoint
+  radius: number
+  radiusGap: number
+  rotateAngle: number
+  loopFacing: 'up' | 'down'
+  numberOfLoops: 1 | 2
+  loopOffsetSteps: number
+  gridStepsBetweenLoops?: number
+  loopStart: number
+  duration: number
+  colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
+  startAtprogressOrchestration: number
+  destructAtFrontProgress: number
+  strokeWidth: StrokeWidthToken
+}
+
 export class PointsCollection {
-  private confettiConfig: Pick<
-    SparkProps,
-    | 'points'
-    | 'duration'
-    | 'colorsWithBreakpoints'
-    | 'startAtprogressOrchestration'
-    | 'destructAtFrontProgress'
-    | 'strokeWidth'
-  >[] = []
+  private confettiConfig: ConfettiSparkConfig[] = []
 
   addLine({
     origin,
@@ -231,19 +264,7 @@ export class PointsCollection {
     startAtprogressOrchestration,
     destructAtFrontProgress,
     strokeWidth,
-  }: {
-    origin: SkPoint
-    radius: number
-    radiusGap: number
-    lineNumber: number
-    startAngle: number
-    lineGapAngle: number
-    duration: number
-    colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
-    startAtprogressOrchestration: number
-    destructAtFrontProgress: number
-    strokeWidth: StrokeWidthToken
-  }): PointsCollection {
+  }: ConfettiLineConfig): PointsCollection {
     const newLines = createLineCollection({
       origin,
       radius,
@@ -282,22 +303,7 @@ export class PointsCollection {
     startAtprogressOrchestration,
     destructAtFrontProgress,
     strokeWidth,
-  }: {
-    origin: SkPoint
-    radius: number
-    radiusGap: number
-    rotateAngle: number
-    loopFacing: 'up' | 'down'
-    numberOfLoops: 1 | 2
-    loopOffsetSteps: number
-    gridStepsBetweenLoops?: number
-    loopStart: number
-    duration: number
-    colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
-    startAtprogressOrchestration: number
-    destructAtFrontProgress: number
-    strokeWidth: StrokeWidthToken
-  }): PointsCollection {
+  }: ConfettiLoopConfig): PointsCollection {
     const loopedLine = createLoopedLine({
       origin,
       radius,

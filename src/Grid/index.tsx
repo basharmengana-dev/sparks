@@ -84,11 +84,6 @@ export class Grid {
     return this.convertToGridCoordinates(pos.x, pos.y)
   }
 
-  getBottomQuarterCenter() {
-    const pos = this.calculatePosition(0.25, 1)
-    return this.convertToGridCoordinates(pos.x, pos.y)
-  }
-
   generateCircles(color: SharedValue<RGBA>) {
     const gridColumns = this.gridWidth / this.cellWidth
     const gridRows = this.gridHeight / this.cellHeight
@@ -111,6 +106,62 @@ export class Grid {
         )
       }
     }
+
+    // NOTE: Add guiding points
+    const gridCenter = this.gridToPixelCoordinates(this.getCenter())
+    circles.push(
+      <Circle
+        cx={gridCenter.x}
+        cy={gridCenter.y}
+        r={2}
+        color={'red'}
+        key={'center'}
+      />,
+    )
+
+    const gridBottomCenter = this.gridToPixelCoordinates(this.getBottomCenter())
+    circles.push(
+      <Circle
+        cx={gridBottomCenter.x}
+        cy={gridBottomCenter.y}
+        r={2}
+        color={'red'}
+        key={'bottom-center'}
+      />,
+    )
+
+    const gridTopCenter = this.gridToPixelCoordinates(this.getTopCenter())
+    circles.push(
+      <Circle
+        cx={gridTopCenter.x}
+        cy={gridTopCenter.y}
+        r={2}
+        color={'red'}
+        key={'top-center'}
+      />,
+    )
+
+    const gridCenterLeft = this.gridToPixelCoordinates(this.getCenterLeft())
+    circles.push(
+      <Circle
+        cx={gridCenterLeft.x}
+        cy={gridCenterLeft.y}
+        r={2}
+        color={'red'}
+        key={'center-left'}
+      />,
+    )
+
+    const gridCenterRight = this.gridToPixelCoordinates(this.getCenterRight())
+    circles.push(
+      <Circle
+        cx={gridCenterRight.x}
+        cy={gridCenterRight.y}
+        r={2}
+        color={'red'}
+        key={'center-right'}
+      />,
+    )
 
     return circles
   }
