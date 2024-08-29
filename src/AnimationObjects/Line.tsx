@@ -5,7 +5,6 @@ import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import { useProgress } from '../AnimationCore/useProgress'
 import { Grid } from '../Grid'
 import { EasingFunction } from '../AnimationCore/utils'
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 import { getAnimationConfig, StrokeWidthToken } from './getAnimationConfig'
 
 export interface LineRef {
@@ -22,10 +21,7 @@ interface LineProps {
   strokeWidth: StrokeWidthToken
   easing: EasingFunction
   duration: number
-  withDelay?: number
   paused: SharedValue<boolean>
-  progressOrchestration: SharedValue<number>
-  startAtprogressOrchestration: number
   grid: Grid
 }
 
@@ -37,9 +33,6 @@ export const Line = forwardRef<LineRef, LineProps>(
       strokeWidth,
       easing,
       duration,
-      withDelay = null,
-      progressOrchestration,
-      startAtprogressOrchestration,
       paused,
       grid,
     },
@@ -54,11 +47,7 @@ export const Line = forwardRef<LineRef, LineProps>(
       from: 0,
       easing,
       duration,
-      withDelay,
-      waitUntilProgress: {
-        progress: progressOrchestration,
-        isValue: startAtprogressOrchestration,
-      },
+      waitUntilRun: true,
       paused,
     })
 

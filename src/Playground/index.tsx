@@ -13,23 +13,13 @@ import {
 import { getConfetti } from '../ConfettiResource/Playground'
 import { Line, LineRef } from '../AnimationObjects/Line'
 import { createLineWithOrigin } from '../Grid/utils'
-import { useProgress } from '../AnimationCore/useProgress'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
   const [keepTrail, setKeepTrail] = useState(false)
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
-
-  const lineRef = useRef<LineRef>(null)
-  const { progress: lineProgress, run } = useProgress({
-    to: 1,
-    from: 0,
-    easing: Easing.inOut(Easing.ease),
-    duration: 1000,
-    paused,
-    waitUntilRun: false,
-  })
+  const lineOrchestration = useRef<LineRef>(null)
 
   const grid = new Grid({
     gridWidth: 100,
@@ -58,15 +48,13 @@ export const Playground = () => {
           ref={confettiOrchestrator}
         />
         <Line
-          ref={lineRef}
+          ref={lineOrchestration}
           points={linePoints}
           colorsWithBreakpoints={ColorSchemes.createPinkColors()}
           strokeWidth={'stroke/2'}
-          easing={Easing.inOut(Easing.ease)}
+          easing={Easing.out(Easing.ease)}
           duration={1000}
           paused={paused}
-          progressOrchestration={lineProgress}
-          startAtprogressOrchestration={0.5}
           grid={grid}
         />
       </Canvas>
@@ -93,8 +81,14 @@ export const Playground = () => {
         <Button
           title={'🎊'}
           onPress={() => {
-            // confettiOrchestrator.current?.run()
-            run()
+            confettiOrchestrator.current?.run()
+          }}
+          color={'white'}
+        />
+        <Button
+          title={'📈'}
+          onPress={() => {
+            lineOrchestration.current?.run()
           }}
           color={'white'}
         />
@@ -113,6 +107,7 @@ export const Playground = () => {
           title={'⏮️'}
           onPress={() => {
             confettiOrchestrator.current?.reset()
+            lineOrchestration.current?.reset()
           }}
           color={'white'}
         />
