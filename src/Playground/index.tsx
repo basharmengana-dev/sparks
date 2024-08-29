@@ -3,7 +3,7 @@ import { Button, View } from 'react-native'
 import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
-import { useSharedValue } from 'react-native-reanimated'
+import { Easing, useSharedValue } from 'react-native-reanimated'
 import { ColorSchemes, RGBA } from '../AnimationObjects/utils'
 import {
   Confetti,
@@ -11,12 +11,25 @@ import {
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
 import { getConfetti } from '../ConfettiResource/Playground'
+import { Line, LineRef } from '../AnimationObjects/Line'
+import { createLineWithOrigin } from '../Grid/utils'
+import { useProgress } from '../AnimationCore/useProgress'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
   const [keepTrail, setKeepTrail] = useState(false)
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
+
+  const lineRef = useRef<LineRef>(null)
+  const { progress: lineProgress, run } = useProgress({
+    to: 1,
+    from: 0,
+    easing: Easing.inOut(Easing.ease),
+    duration: 1000,
+    paused,
+    waitUntilRun: false,
+  })
 
   const grid = new Grid({
     gridWidth: 100,
@@ -28,6 +41,11 @@ export const Playground = () => {
   })
 
   const confetti: Confetti[] = getConfetti({ keepTrail, grid })
+  const linePoints = createLineWithOrigin(
+    grid.getCenter(),
+    { x: 5, y: 5 },
+    { x: 10, y: 10 },
+  )
 
   return (
     <>
@@ -38,6 +56,18 @@ export const Playground = () => {
           grid={grid}
           paused={paused}
           ref={confettiOrchestrator}
+        />
+        <Line
+          ref={lineRef}
+          points={linePoints}
+          colorsWithBreakpoints={ColorSchemes.createPinkColors()}
+          strokeWidth={'stroke/2'}
+          easing={Easing.inOut(Easing.ease)}
+          duration={1000}
+          paused={paused}
+          progressOrchestration={lineProgress}
+          startAtprogressOrchestration={0.5}
+          grid={grid}
         />
       </Canvas>
       <View
@@ -63,7 +93,8 @@ export const Playground = () => {
         <Button
           title={'🎊'}
           onPress={() => {
-            confettiOrchestrator.current?.run()
+            // confettiOrchestrator.current?.run()
+            run()
           }}
           color={'white'}
         />
