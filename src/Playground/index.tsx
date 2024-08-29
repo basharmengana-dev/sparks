@@ -1,25 +1,20 @@
+import React from 'react'
 import { Button, View } from 'react-native'
 import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
-import { FireworkOrchestrator, FireworkOrchestratorRef } from '../Firework'
 import { useSharedValue } from 'react-native-reanimated'
 import { ColorSchemes, RGBA } from '../AnimationObjects/utils'
-import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 import {
   Confetti,
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
-import { line } from 'd3-shape'
 
 export const Playground = () => {
   const paused = useSharedValue(false)
   const gridColor = useSharedValue<RGBA>([0.596, 0.984, 0.596, 1.0])
-  const [strokeWidth, setStrokeWidth] = useState<StrokeWidthToken>('stroke/3')
   const [keepTrail, setKeepTrail] = useState(false)
-
-  const fireworkOchestration = useRef<FireworkOrchestratorRef>(null)
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
 
   const grid = new Grid({
@@ -200,14 +195,6 @@ export const Playground = () => {
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
         {grid.generateCircles(gridColor)}
-        <FireworkOrchestrator
-          grid={grid}
-          paused={paused}
-          ref={fireworkOchestration}
-          keepTrail={keepTrail}
-          strokeWidth={strokeWidth}
-        />
-
         <ConfettiOrchestrator
           confetti={confetti}
           grid={grid}
