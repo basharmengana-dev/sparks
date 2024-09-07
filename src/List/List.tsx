@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useMemo } from 'react'
 import {
   FlatList,
   Text,
@@ -9,12 +9,11 @@ import {
   SafeAreaView,
   Button,
 } from 'react-native'
-import { Canvas, Rect } from '@shopify/react-native-skia'
+import { Canvas, Circle } from '@shopify/react-native-skia'
 import { Grid } from '../Grid'
 import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../AnimationObjects/utils'
 import {
-  Confetti,
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
@@ -25,6 +24,14 @@ interface ListItem {
   value: string
   recipient: string
 }
+
+const grid = new Grid({
+  gridWidth: 100,
+  gridHeight: 100,
+  cellWidth: 4,
+  cellHeight: 2,
+  radius: 1,
+})
 
 export const List: React.FC = () => {
   const data: ListItem[] = [
@@ -45,7 +52,18 @@ export const List: React.FC = () => {
     },
   ]
 
-  const renderItem: ListRenderItem<ListItem> = ({ item }) => (
+  const [positions, setPositions] = useState<{ x: number; y: number }[]>([])
+
+  const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
+  const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 1.0])
+  const confetti = useMemo(() => {
+    return getConfetti({
+      keepTrail: false,
+      origin: grid.getCenter(),
+    })
+  }, [])
+
+  const renderItem: ListRenderItem<ListItem> = ({ item, index }) => (
     <View style={styles.itemContainer}>
       <Image
         source={{
@@ -60,19 +78,6 @@ export const List: React.FC = () => {
     </View>
   )
 
-  // ===== Canvas =====
-  const grid = new Grid({
-    gridWidth: 100,
-    gridHeight: 100,
-    cellWidth: 4,
-    cellHeight: 2,
-    color: 'chartreuse',
-    radius: 1,
-  })
-  const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 1.0])
-  const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
-  const confetti: Confetti[] = getConfetti({ keepTrail: false, grid })
-
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeAreaContainer}>
@@ -80,19 +85,35 @@ export const List: React.FC = () => {
           data={data}
           renderItem={renderItem}
           keyExtractor={item => item.key}
-          style={styles.flatList} // Apply marginTop to start the list 100px below
+          style={styles.flatList}
         />
       </SafeAreaView>
 
-      <Canvas style={styles.canvas}>
-        {grid.generateCircles({ dotColor: gridColor, printAnchorDots: false })}
-        <ConfettiOrchestrator
-          confetti={confetti}
-          grid={grid}
-          paused={useSharedValue(false)}
-          ref={confettiOrchestrator}
-        />
-      </Canvas>
+      <View style={styles.canvas}>
+        <Canvas style={{ flex: 1 }}>
+          {grid.generateCircles({
+            dotColor: gridColor,
+            printAnchorDots: false,
+          })}
+
+          <ConfettiOrchestrator
+            confetti={confetti}
+            grid={grid}
+            paused={useSharedValue(false)}
+            ref={confettiOrchestrator}
+          />
+
+          {positions.length > 0 && (
+            <Circle
+              cx={positions[0].x}
+              cy={positions[0].y}
+              r={5}
+              color={'red'}
+            />
+          )}
+        </Canvas>
+      </View>
+
       <View
         style={{
           position: 'absolute',
@@ -144,7 +165,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    marginLeft: 30,
+    paddingLeft: 30,
     alignItems: 'center',
   },
   avatar: {

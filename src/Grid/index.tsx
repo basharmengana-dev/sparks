@@ -8,7 +8,6 @@ export type GridOptions = {
   gridHeight: number
   cellWidth: number
   cellHeight: number
-  color?: string
   radius?: number
 }
 
@@ -24,7 +23,6 @@ export class Grid {
     gridHeight,
     cellWidth,
     cellHeight,
-    color = 'white',
     radius = 2,
   }: GridOptions) {
     this.gridWidth = widthPercentageToDP(gridWidth)

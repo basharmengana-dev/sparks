@@ -26,11 +26,13 @@ export const Playground = () => {
     gridHeight: 100,
     cellWidth: 4,
     cellHeight: 2,
-    color: 'chartreuse',
     radius: 1,
   })
 
-  const confetti: Confetti[] = getConfetti({ keepTrail, grid })
+  const confetti: Confetti[] = getConfetti({
+    keepTrail,
+    origin: grid.getCenter(),
+  })
   const linePoints = createLineWithOrigin(
     grid.getCenter(),
     { x: 5, y: 5 },

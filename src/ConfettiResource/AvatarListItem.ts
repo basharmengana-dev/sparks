@@ -1,16 +1,16 @@
+import { SkPoint } from '@shopify/react-native-skia'
 import { ColorSchemes } from '../AnimationObjects/utils'
 import { Confetti } from '../Confetti/ConfettiOrchestration'
-import { Grid } from '../Grid'
 
 export const getConfetti = ({
+  origin,
   keepTrail,
-  grid,
 }: {
+  origin: SkPoint
   keepTrail: boolean
-  grid: Grid
 }): Confetti[] => [
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 1,
     radiusGap: 2,
     lineNumber: 7,
@@ -24,7 +24,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 1,
     radiusGap: 1.8,
     lineNumber: 7,
@@ -38,7 +38,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 1,
     radiusGap: 2.3,
     lineNumber: 7,
