@@ -1,8 +1,8 @@
 import React from 'react'
-import { Playground } from './src/Playground'
+import { List } from './src/List'
 
 function App(): React.JSX.Element {
-  return <Playground />
+  return <List />
 }
 
 export default App

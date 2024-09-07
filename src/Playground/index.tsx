@@ -10,7 +10,7 @@ import {
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
-import { getConfetti } from '../ConfettiResource/Playground'
+import { getConfetti } from '../ConfettiResource/AvatarListItem'
 import { Line, LineRef } from '../AnimationObjects/Line'
 import { createLineWithOrigin } from '../Grid/utils'
 
@@ -40,7 +40,7 @@ export const Playground = () => {
   return (
     <>
       <Canvas style={{ flex: 1, backgroundColor: 'black' }}>
-        {grid.generateCircles(gridColor)}
+        {grid.generateCircles({ dotColor: gridColor, printAnchorDots: true })}
         <ConfettiOrchestrator
           confetti={confetti}
           grid={grid}

@@ -84,7 +84,13 @@ export class Grid {
     return this.convertToGridCoordinates(pos.x, pos.y)
   }
 
-  generateCircles(color: SharedValue<RGBA>) {
+  generateCircles({
+    dotColor,
+    printAnchorDots,
+  }: {
+    dotColor: SharedValue<RGBA> | string
+    printAnchorDots: boolean
+  }) {
     const gridColumns = this.gridWidth / this.cellWidth
     const gridRows = this.gridHeight / this.cellHeight
 
@@ -100,12 +106,14 @@ export class Grid {
             cx={cx}
             cy={cy}
             r={this.radius}
-            color={color}
+            color={dotColor}
             key={`${i}-${j}`}
           />,
         )
       }
     }
+
+    if (!printAnchorDots) return circles
 
     // NOTE: Add guiding points
     const gridCenter = this.gridToPixelCoordinates(this.getCenter())
