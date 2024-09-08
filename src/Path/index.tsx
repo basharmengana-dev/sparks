@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { Path as SkiaPath, Shader, SkPoint } from '@shopify/react-native-skia'
 import { PathGeometry } from './PathGeometry'
 import { SharedValue, useDerivedValue } from 'react-native-reanimated'
@@ -7,7 +7,7 @@ import { Grid } from '../Grid'
 import { AnimationConfig } from '../AnimationObjects/getAnimationConfig'
 
 export const Path = ({
-  points,
+  points: inputPoints,
   grid,
   maxIntersectionsAllowed,
   progressFront,
@@ -23,15 +23,10 @@ export const Path = ({
   colorBreakpoints: { breakpoint: number; color: number[] }[]
   animationConfig: AnimationConfig
 }) => {
-  const preparedPath = useMemo(
-    () =>
-      new PathGeometry({
-        points,
-        grid,
-      }),
-    [points, grid],
-  )
+  // Use a ref to store cached calculation results
+  const cachedDataRef = useRef<any>(null)
 
+  // Perform calculation only when progressFront !== 1 and progressBack !== 0
   const {
     flattenedPoints,
     flattenedDistances,
@@ -43,6 +38,20 @@ export const Path = ({
     pathSVG,
     intersections,
   } = useMemo(() => {
+    // If cached data exists and we are in the condition where we should not calculate
+    if (
+      cachedDataRef.current &&
+      (progressFront.value === 1 || progressBack.value === 0)
+    ) {
+      // Return the cached data
+      return cachedDataRef.current
+    }
+    const preparedPath = new PathGeometry({
+      points: inputPoints,
+      grid,
+    })
+
+    // Otherwise, calculate and cache the result
     const pathSVG = preparedPath.path.toSVGString()
     const totalLength = preparedPath.getTotalLength()
 
@@ -84,7 +93,7 @@ export const Path = ({
       tangentExtension: animationConfig.tangentExtension,
     })
 
-    return {
+    const calculatedData = {
       flattenedPoints,
       flattenedDistances,
       totalLength,
@@ -95,7 +104,12 @@ export const Path = ({
       pathSVG,
       intersections,
     }
-  }, [preparedPath])
+
+    // Cache the calculated data
+    cachedDataRef.current = calculatedData
+
+    return calculatedData
+  }, [progressFront.value, progressBack.value, inputPoints, grid])
 
   const uniforms = useDerivedValue(() => ({
     u_totalLength: totalLength,

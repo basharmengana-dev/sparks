@@ -129,7 +129,7 @@ export const List: React.FC = () => {
   )
 
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
-  const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 1.0])
+  const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 0.0])
   const confetti = useMemo(() => {
     return getConfetti({
       keepTrail: false,

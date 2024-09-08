@@ -1,20 +1,8 @@
 import { useProgress } from '../AnimationCore/useProgress'
 import { Spark, SparkRef } from '../AnimationObjects/Spark'
-import { Circle, SkPoint } from '@shopify/react-native-skia'
 import { Easing, SharedValue } from 'react-native-reanimated'
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react'
 import { Grid } from '../Grid'
-import { createLineWithOrigin, getLast } from '../Grid/utils'
-import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
-import { type SparkProps } from '../AnimationObjects/Spark'
-import { ColorSchemes, ac, c } from '../AnimationObjects/utils'
 import React from 'react'
 import {
   PointsCollection,
@@ -91,17 +79,6 @@ export const ConfettiOrchestrator = forwardRef<
     run,
     reset,
   }))
-
-  const [confettiCount, setConfettiCount] = useState(confettiCollection.length)
-  const [autoDraw, setAutoDraw] = useState(true)
-
-  useEffect(() => {
-    if (autoDraw && confettiCollection.length !== confettiCount) {
-      reset()
-      run()
-      setConfettiCount(confettiCollection.length)
-    }
-  }, [confettiCollection.length, autoDraw])
 
   return (
     <>

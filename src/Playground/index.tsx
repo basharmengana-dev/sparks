@@ -10,7 +10,7 @@ import {
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
-import { getConfetti } from '../ConfettiResource/AvatarListItem'
+import { getConfetti } from '../ConfettiResource/Playground'
 import { Line, LineRef } from '../AnimationObjects/Line'
 import { createLineWithOrigin } from '../Grid/utils'
 

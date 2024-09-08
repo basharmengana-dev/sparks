@@ -1,16 +1,16 @@
+import { SkPoint } from '@shopify/react-native-skia'
 import { ColorSchemes } from '../AnimationObjects/utils'
 import { Confetti } from '../Confetti/ConfettiOrchestration'
-import { Grid } from '../Grid'
 
 export const getConfetti = ({
+  origin,
   keepTrail,
-  grid,
 }: {
+  origin: SkPoint
   keepTrail: boolean
-  grid: Grid
 }): Confetti[] => [
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 2,
     radiusGap: 1,
     lineNumber: 3,
@@ -24,7 +24,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 3,
     radiusGap: 1,
     lineNumber: 2,
@@ -38,7 +38,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 3.5,
     radiusGap: 2,
     lineNumber: 3,
@@ -52,7 +52,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 3.5,
     radiusGap: 1.5,
     lineNumber: 5,
@@ -66,7 +66,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 4,
     radiusGap: 1,
     rotateAngle: 30,
@@ -82,7 +82,7 @@ export const getConfetti = ({
     lineType: 'loop',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 5,
     radiusGap: 1.5,
     rotateAngle: -100,
@@ -98,7 +98,7 @@ export const getConfetti = ({
     lineType: 'loop',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 6,
     radiusGap: 1.25,
     rotateAngle: 100,
@@ -114,7 +114,7 @@ export const getConfetti = ({
     lineType: 'loop',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 5,
     radiusGap: 1.5,
     rotateAngle: 310,
@@ -130,7 +130,7 @@ export const getConfetti = ({
     lineType: 'loop',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 1,
     radiusGap: 4,
     lineNumber: 7,
@@ -144,7 +144,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 1,
     radiusGap: 3.8,
     lineNumber: 7,
@@ -158,7 +158,7 @@ export const getConfetti = ({
     lineType: 'line',
   },
   {
-    origin: grid.getCenter(),
+    origin,
     radius: 1,
     radiusGap: 2.5,
     lineNumber: 7,
