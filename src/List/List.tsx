@@ -1,15 +1,18 @@
-import React, { useRef, useState, useMemo } from 'react'
+import React, { useState, useCallback, useRef, useMemo } from 'react'
 import {
   FlatList,
   Text,
   View,
   Image,
   StyleSheet,
-  ListRenderItem,
   SafeAreaView,
   Button,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  ActivityIndicator,
 } from 'react-native'
-import { Canvas, Circle } from '@shopify/react-native-skia'
+import { Canvas } from '@shopify/react-native-skia'
 import { Grid } from '../Grid'
 import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../AnimationObjects/utils'
@@ -19,10 +22,10 @@ import {
 } from '../Confetti/ConfettiOrchestration'
 import { getConfetti } from '../ConfettiResource/AvatarListItem'
 
-interface ListItem {
-  key: string
-  value: string
-  recipient: string
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true)
+  }
 }
 
 const grid = new Grid({
@@ -33,26 +36,97 @@ const grid = new Grid({
   radius: 1,
 })
 
-export const List: React.FC = () => {
-  const data: ListItem[] = [
-    {
-      key: '1',
-      value: '90',
-      recipient: 'John Doe',
-    },
-    {
-      key: '2',
-      value: '15',
-      recipient: 'Jane Smith',
-    },
-    {
-      key: '3',
-      value: '100',
-      recipient: 'Sam Johnson',
-    },
-  ]
+interface ListItem {
+  key: string
+  value: string
+  recipient: string
+}
 
-  const [positions, setPositions] = useState<{ x: number; y: number }[]>([])
+const ListItemComponent: React.FC<{ item: ListItem }> = React.memo(
+  ({ item }) => {
+    return (
+      <View style={styles.itemContainer}>
+        <Image
+          source={{
+            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.recipient}`,
+          }}
+          style={styles.avatar}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.value}>£{item.value}</Text>
+          <Text style={styles.recipient}>{item.recipient}</Text>
+        </View>
+      </View>
+    )
+  },
+)
+
+const NewItemComponent: React.FC<{
+  item: ListItem
+  loading: boolean
+}> = React.memo(({ item, loading }) => {
+  return (
+    <View style={[styles.itemContainer, styles.newItemContainer]}>
+      {loading ? (
+        <View style={styles.avatarLoading}>
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="small" color="#0000ff" />
+          </View>
+        </View>
+      ) : (
+        <Image
+          source={{
+            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.recipient}`,
+          }}
+          style={styles.avatar}
+        />
+      )}
+      <View style={styles.textContainer}>
+        <Text style={styles.value}>£{item.value}</Text>
+        <Text style={styles.recipient}>{item.recipient}</Text>
+      </View>
+    </View>
+  )
+})
+
+export const List: React.FC = () => {
+  const [data, setData] = useState<ListItem[]>([
+    { key: '1', value: '90', recipient: 'John Doe' },
+    { key: '2', value: '15', recipient: 'Jane Smith' },
+    { key: '3', value: '100', recipient: 'Sam Johnson' },
+  ])
+  const [newlyAddedKey, setNewlyAddedKey] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleAddItem = () => {
+    // Trigger layout animation immediately
+    setLoading(true)
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+
+    const newItem = {
+      key: String(data.length + 1),
+      value: String(Math.floor(Math.random() * 100)),
+      recipient: 'New Recipient',
+    }
+
+    setData(prevData => [...prevData, newItem])
+    setNewlyAddedKey(newItem.key)
+
+    setTimeout(() => {
+      setLoading(false)
+    }, 2000)
+  }
+
+  const renderItem = useCallback(
+    ({ item }: { item: ListItem }) => {
+      if (item.key === newlyAddedKey) {
+        return <NewItemComponent item={item} loading={loading} />
+      } else {
+        return <ListItemComponent item={item} />
+      }
+    },
+    [newlyAddedKey, loading],
+  )
 
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
   const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 1.0])
@@ -63,21 +137,6 @@ export const List: React.FC = () => {
     })
   }, [])
 
-  const renderItem: ListRenderItem<ListItem> = ({ item, index }) => (
-    <View style={styles.itemContainer}>
-      <Image
-        source={{
-          uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.recipient}`,
-        }}
-        style={styles.avatar}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.value}>£{item.value}</Text>
-        <Text style={styles.recipient}>{item.recipient}</Text>
-      </View>
-    </View>
-  )
-
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeAreaContainer}>
@@ -86,6 +145,13 @@ export const List: React.FC = () => {
           renderItem={renderItem}
           keyExtractor={item => item.key}
           style={styles.flatList}
+          inverted
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'flex-end',
+            top: -50,
+          }}
+          ListHeaderComponent={<View style={{ height: 200 }} />} // Add 100px at the top
         />
       </SafeAreaView>
 
@@ -102,30 +168,11 @@ export const List: React.FC = () => {
             paused={useSharedValue(false)}
             ref={confettiOrchestrator}
           />
-
-          {positions.length > 0 && (
-            <Circle
-              cx={positions[0].x}
-              cy={positions[0].y}
-              r={5}
-              color={'red'}
-            />
-          )}
         </Canvas>
       </View>
 
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          padding: 20,
-          width: '100%',
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          columnGap: 10,
-        }}>
+      <View style={styles.controls}>
+        <Button title={'🆕'} onPress={handleAddItem} />
         <Button
           title={'🎊'}
           onPress={() => {
@@ -150,41 +197,50 @@ export const List: React.FC = () => {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeAreaContainer: {
-    flex: 1,
-  },
-  flatList: {
-    flex: 1,
-    paddingTop: 100,
-  },
+  container: { flex: 1 },
+  safeAreaContainer: { flex: 1 },
+  flatList: { flex: 1, paddingTop: 100 },
   itemContainer: {
     flexDirection: 'row',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    paddingLeft: 30,
+    paddingLeft: 40,
     alignItems: 'center',
   },
-  avatar: {
+  newItemContainer: {
+    backgroundColor: 'rgba(0, 255, 0, 0.2)', // Highlight for new items
+  },
+  avatar: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
+  avatarLoading: {
     width: 50,
     height: 50,
     borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee',
     marginRight: 10,
   },
-  textContainer: {
-    flex: 1,
-    flexDirection: 'column',
+  loaderContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    paddingLeft: 2,
   },
-  value: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  recipient: {
-    fontSize: 14,
-    color: '#666',
+  textContainer: { flex: 1, flexDirection: 'column' },
+  value: { fontSize: 16, fontWeight: 'bold' },
+  recipient: { fontSize: 14, color: '#666' },
+  controls: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    padding: 20,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    columnGap: 10,
   },
   canvas: {
     position: 'absolute',
