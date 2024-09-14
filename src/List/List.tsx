@@ -15,7 +15,7 @@ import {
 import { Canvas } from '@shopify/react-native-skia'
 import { Grid } from '../Grid'
 import { useSharedValue } from 'react-native-reanimated'
-import { RGBA } from '../AnimationObjects/utils'
+import { RGBA } from '../AnimationObjects/ColorSchemas'
 import {
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
@@ -113,6 +113,7 @@ export const List: React.FC = () => {
     setNewlyAddedKey(newItem.key)
 
     setTimeout(() => {
+      confettiOrchestrator.current?.run()
       setLoading(false)
     }, 2000)
   }
@@ -128,12 +129,13 @@ export const List: React.FC = () => {
     [newlyAddedKey, loading],
   )
 
+  const [confettiPoint, setConfettiPoint] = useState({ x: 4.2, y: 41.55 })
   const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
   const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 0.0])
   const confetti = useMemo(() => {
     return getConfetti({
       keepTrail: false,
-      origin: grid.getCenter(),
+      origin: confettiPoint,
     })
   }, [])
 

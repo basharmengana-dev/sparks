@@ -11,6 +11,11 @@ export const ac = (alpha: number, color: RGB): RGBA => {
   return [...color.map(c => c * alpha), alpha] as RGBA
 }
 
+export type ColorSchema = {
+  breakpoint: number
+  color: RGBA
+}[]
+
 class ColorSchemeGenerator {
   static defaultBreakpoints = 5
 

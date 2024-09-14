@@ -4,7 +4,7 @@ import { Canvas } from '@shopify/react-native-skia'
 import { useRef, useState } from 'react'
 import { Grid } from '../Grid'
 import { Easing, useSharedValue } from 'react-native-reanimated'
-import { ColorSchemes, RGBA } from '../AnimationObjects/utils'
+import { ColorSchemes, RGBA } from '../AnimationObjects/ColorSchemas'
 import {
   Confetti,
   ConfettiOrchestrator,
@@ -52,7 +52,7 @@ export const Playground = () => {
         <Line
           ref={lineOrchestration}
           points={linePoints}
-          colorsWithBreakpoints={ColorSchemes.createPinkColors()}
+          colorsWithBreakpoints={ColorSchemes.createPastelColors()}
           strokeWidth={'stroke/2'}
           easing={Easing.out(Easing.ease)}
           duration={1000}

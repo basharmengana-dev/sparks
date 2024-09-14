@@ -1,6 +1,7 @@
 import { SkPoint } from '@shopify/react-native-skia'
 import { SparkProps } from '../AnimationObjects/Spark'
-import { c, ColorSchemes } from '../AnimationObjects/utils'
+
+import { type ColorSchema } from '../AnimationObjects/ColorSchemas'
 import { StrokeWidthToken } from '../AnimationObjects/getAnimationConfig'
 
 export const createLine = ({
@@ -226,7 +227,7 @@ export type ConfettiLineConfig = {
   startAngle: number
   lineGapAngle: number
   duration: number
-  colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
+  colorsWithBreakpoints: ColorSchema
   startAtprogressOrchestration: number
   destructAtFrontProgress: number
   strokeWidth: StrokeWidthToken
@@ -243,7 +244,7 @@ export type ConfettiLoopConfig = {
   gridStepsBetweenLoops?: number
   loopStart: number
   duration: number
-  colorsWithBreakpoints: ReturnType<typeof ColorSchemes.createPinkColors>
+  colorsWithBreakpoints: ColorSchema
   startAtprogressOrchestration: number
   destructAtFrontProgress: number
   strokeWidth: StrokeWidthToken
