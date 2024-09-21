@@ -6,7 +6,6 @@ import {
   Image,
   StyleSheet,
   SafeAreaView,
-  Button,
   LayoutAnimation,
   Platform,
   UIManager,
@@ -22,6 +21,13 @@ import {
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
 import { getConfetti } from '../ConfettiResource/AvatarListItem'
+import {
+  Spinner,
+  useTheme,
+  Button,
+  Icon,
+  IconElement,
+} from '@ui-kitten/components'
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -43,60 +49,152 @@ interface ListItem {
   description: string
 }
 
-const ListItemComponent: React.FC<{ item: ListItem }> = React.memo(
-  ({ item }) => {
-    return (
-      <View style={styles.itemContainer}>
-        <Image
-          source={{
-            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.item}`,
-          }}
-          style={styles.avatar}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.value}>{item.item}</Text>
-          <Text style={styles.recipient}>{item.description}</Text>
-        </View>
-      </View>
-    )
-  },
-)
+function getRandomFirstName(): string {
+  const firstNames: string[] = [
+    'Aaliyah',
+    'Hiroshi',
+    'Zara',
+    'Mateo',
+    'Fatima',
+    'Luca',
+    'Priya',
+    'Ahmed',
+    'Yara',
+    'Dante',
+    'Santiago',
+    'Amara',
+    'Kofi',
+    'Mei',
+    'Hassan',
+    'Leila',
+    'Akira',
+    'Zainab',
+    'Elio',
+    'Tariq',
+    'Indira',
+    'Omar',
+    'Sofia',
+    'Anaya',
+    'Nina',
+    'Wei',
+    'Juan',
+    'Aria',
+    'Mohammed',
+    'Suki',
+    'Aliyah',
+    'Ibrahim',
+    'Aminata',
+    'Ezra',
+    'Keiko',
+    'Selim',
+    'Mina',
+    'Ayesha',
+    'Zuri',
+    'Ravi',
+  ]
 
-const NewItemComponent: React.FC<{
+  const randomFirstName =
+    firstNames[Math.floor(Math.random() * firstNames.length)]
+
+  return randomFirstName
+}
+
+const ItemComponent: React.FC<{
   item: ListItem
   loading: boolean
   firstItemRef: React.RefObject<ActivityIndicator>
-}> = React.memo(({ item, loading, firstItemRef }) => {
+  newlyAddedKey: string | null
+}> = React.memo(({ item, loading, firstItemRef, newlyAddedKey }) => {
+  const styles = StyleSheet.create({
+    itemContainer: {
+      flexDirection: 'row',
+      paddingLeft: 40,
+      alignItems: 'center',
+      height: 80,
+    },
+    avatar: {
+      width: 60,
+      height: 60,
+      borderRadius: 25,
+      marginRight: 10,
+    },
+    avatarLoading: {
+      width: 60,
+      height: 60,
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'darkgray',
+      marginRight: 10,
+    },
+    loaderContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+      paddingLeft: 2,
+    },
+    textContainer: { flex: 1, flexDirection: 'column' },
+    item: { fontSize: 16, fontWeight: 'bold' },
+    description: { fontSize: 14, color: '#666' },
+  })
+
   return (
-    <View style={[styles.itemContainer, styles.newItemContainer]}>
-      {loading ? (
+    <View style={[styles.itemContainer]}>
+      {newlyAddedKey === item.key && loading ? (
         <View style={styles.avatarLoading}>
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="small" color="#gray" ref={firstItemRef} />
+          <View style={styles.loaderContainer} ref={firstItemRef}>
+            <Spinner size="medium" status="basic" />
           </View>
         </View>
       ) : (
         <Image
           source={{
-            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.item}`,
+            uri: `https://api.dicebear.com/9.x/avataaars/jpg?seed=${item.item}&backgroundColor=b6e3f4,c0aede,d1d4f9`,
           }}
           style={styles.avatar}
         />
       )}
       <View style={styles.textContainer}>
-        <Text style={styles.value}>{item.item}</Text>
-        <Text style={styles.recipient}>{item.description}</Text>
+        <Text style={styles.item}>{item.item}</Text>
+        <Text style={styles.description}>{item.description}</Text>
       </View>
     </View>
   )
 })
 
 export const List: React.FC = () => {
+  const theme = useTheme()
+
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme['color-primary-100'] },
+    safeAreaContainer: { flex: 1 },
+    flatList: { flex: 1 },
+    button: {
+      margin: 2,
+      height: 80,
+      marginBottom: -5,
+      width: '110%',
+      alignSelf: 'center',
+    },
+    canvas: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      pointerEvents: 'none',
+    },
+  })
+
   const [data, setData] = useState<ListItem[]>([
-    { key: '1', item: 'Oranges', description: '£2' },
-    { key: '2', item: 'Bananas', description: '£5' },
-    { key: '3', item: 'Kiwis', description: '£20' },
+    { key: '1', item: 'Carlos', description: 'Brother' },
+    { key: '2', item: 'Carnita', description: 'Sister' },
+    { key: '3', item: 'Lupin', description: 'Dad' },
+    { key: '4', item: 'Lapida', description: 'Mom' },
   ])
+  const flatListRef = useRef<FlatList<ListItem>>(null) // Ref to control the FlatList
+
   const [newlyAddedKey, setNewlyAddedKey] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -107,14 +205,14 @@ export const List: React.FC = () => {
   const firstItemRef = useRef<ActivityIndicator | null>(null) // Ref for the first item
   const measureFirstItemPosition = () => {
     if (firstItemRef.current) {
-      firstItemRef.current.measureInWindow((x, y, width, height) => {
+      firstItemRef.current.measureInWindow((x, y) => {
         const convertedToGridPoint = grid.convertToGridCoordinates(x, y)
 
         setConfetti(
           getConfetti({
             origin: {
-              x: convertedToGridPoint.x + 0.2,
-              y: convertedToGridPoint.y - 0.4,
+              x: convertedToGridPoint.x + 1.45,
+              y: convertedToGridPoint.y - 1.65,
             },
             keepTrail: false,
           }),
@@ -130,20 +228,22 @@ export const List: React.FC = () => {
   }, [data])
 
   const handleAddItem = () => {
-    // Trigger layout animation immediately
     setLoading(true)
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
 
     const newItem: ListItem = {
       key: String(data.length + 1),
-      item: 'Watermelon',
-      description: '£' + String(Math.floor(Math.random() * 100)),
+      item: getRandomFirstName(),
+      description: 'Friend',
     }
 
     setData(prevData => [...prevData, newItem])
     setNewlyAddedKey(newItem.key)
 
     measureFirstItemPosition()
+    setTimeout(() => {
+      flatListRef.current?.scrollToIndex({ index: data.length, animated: true })
+    }, 500)
     setTimeout(() => {
       confettiOrchestrator.current?.run()
       setLoading(false)
@@ -152,17 +252,14 @@ export const List: React.FC = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: ListItem }) => {
-      if (item.key === newlyAddedKey) {
-        return (
-          <NewItemComponent
-            item={item}
-            loading={loading}
-            firstItemRef={firstItemRef}
-          />
-        )
-      } else {
-        return <ListItemComponent item={item} />
-      }
+      return (
+        <ItemComponent
+          item={item}
+          loading={loading}
+          firstItemRef={firstItemRef}
+          newlyAddedKey={newlyAddedKey}
+        />
+      )
     },
     [newlyAddedKey, loading],
   )
@@ -171,6 +268,7 @@ export const List: React.FC = () => {
     <View style={styles.container}>
       <SafeAreaView style={styles.safeAreaContainer}>
         <FlatList
+          ref={flatListRef} // Attach the ref to FlatList
           data={data}
           renderItem={renderItem}
           keyExtractor={item => item.key}
@@ -179,7 +277,6 @@ export const List: React.FC = () => {
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: 'flex-end',
-            top: -50,
           }}
           ListHeaderComponent={<View style={{ height: 200 }} />} // Add 100px at the top
         />
@@ -200,84 +297,12 @@ export const List: React.FC = () => {
           />
         </Canvas>
       </View>
-
-      <View style={styles.controls}>
-        <Button title={'🆕'} onPress={handleAddItem} />
-        <Button
-          title={'🎊'}
-          onPress={() => {
-            confettiOrchestrator.current?.run()
-          }}
-          color={'white'}
-        />
-        <Button
-          title={'🔳'}
-          onPress={() => {
-            if (gridColor.value[3] === 1) {
-              gridColor.value = [0.0, 0.0, 0.0, 0.0]
-            } else {
-              gridColor.value = [0.0, 0.0, 0.0, 1.0]
-            }
-          }}
-          color={'white'}
-        />
-      </View>
+      <Button
+        style={styles.button}
+        accessoryLeft={<Icon fill="white" name="plus" />}
+        onPress={handleAddItem}>
+        ADD
+      </Button>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safeAreaContainer: { flex: 1 },
-  flatList: { flex: 1, paddingTop: 100 },
-  itemContainer: {
-    flexDirection: 'row',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    paddingLeft: 40,
-    alignItems: 'center',
-  },
-  newItemContainer: {
-    backgroundColor: 'rgba(0, 255, 0, 0.2)', // Highlight for new items
-  },
-  avatar: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
-  avatarLoading: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#eee',
-    marginRight: 10,
-  },
-  loaderContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
-    paddingLeft: 2,
-  },
-  textContainer: { flex: 1, flexDirection: 'column' },
-  value: { fontSize: 16, fontWeight: 'bold' },
-  recipient: { fontSize: 14, color: '#666' },
-  controls: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    padding: 20,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    columnGap: 10,
-  },
-  canvas: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    pointerEvents: 'none',
-  },
-})
