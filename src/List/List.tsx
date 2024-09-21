@@ -9,7 +9,6 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  ActivityIndicator,
 } from 'react-native'
 import { Canvas } from '@shopify/react-native-skia'
 import { Grid } from '../Grid'
@@ -99,10 +98,11 @@ function getRandomFirstName(): string {
   return randomFirstName
 }
 
+const AVATAR_SIZE = 60
 const ItemComponent: React.FC<{
   item: ListItem
   loading: boolean
-  firstItemRef: React.RefObject<ActivityIndicator>
+  firstItemRef: React.RefObject<View>
   newlyAddedKey: string | null
 }> = React.memo(({ item, loading, firstItemRef, newlyAddedKey }) => {
   const styles = StyleSheet.create({
@@ -113,14 +113,13 @@ const ItemComponent: React.FC<{
       height: 80,
     },
     avatar: {
-      width: 60,
-      height: 60,
+      width: AVATAR_SIZE,
+      height: AVATAR_SIZE,
       borderRadius: 25,
-      marginRight: 10,
     },
     avatarLoading: {
-      width: 60,
-      height: 60,
+      width: AVATAR_SIZE,
+      height: AVATAR_SIZE,
       borderRadius: 25,
       justifyContent: 'center',
       alignItems: 'center',
@@ -134,7 +133,7 @@ const ItemComponent: React.FC<{
       height: '100%',
       paddingLeft: 2,
     },
-    textContainer: { flex: 1, flexDirection: 'column' },
+    textContainer: { flex: 1, flexDirection: 'column', marginLeft: 10 },
     item: { fontSize: 16, fontWeight: 'bold' },
     description: { fontSize: 14, color: '#666' },
   })
@@ -143,17 +142,19 @@ const ItemComponent: React.FC<{
     <View style={[styles.itemContainer]}>
       {newlyAddedKey === item.key && loading ? (
         <View style={styles.avatarLoading}>
-          <View style={styles.loaderContainer} ref={firstItemRef}>
+          <View style={styles.loaderContainer}>
             <Spinner size="medium" status="basic" />
           </View>
         </View>
       ) : (
-        <Image
-          source={{
-            uri: `https://api.dicebear.com/9.x/avataaars/jpg?seed=${item.item}&backgroundColor=b6e3f4,c0aede,d1d4f9`,
-          }}
-          style={styles.avatar}
-        />
+        <View ref={firstItemRef}>
+          <Image
+            source={{
+              uri: `https://api.dicebear.com/9.x/avataaars/jpg?seed=${item.item}&backgroundColor=b6e3f4,c0aede,d1d4f9`,
+            }}
+            style={styles.avatar}
+          />
+        </View>
       )}
       <View style={styles.textContainer}>
         <Text style={styles.item}>{item.item}</Text>
@@ -173,7 +174,7 @@ export const List: React.FC = () => {
     button: {
       margin: 2,
       height: 80,
-      marginBottom: -5,
+      marginBottom: -1,
       width: '110%',
       alignSelf: 'center',
     },
@@ -202,17 +203,19 @@ export const List: React.FC = () => {
   const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 0.0])
   const [confetti, setConfetti] = useState<Confetti[]>([])
 
-  const firstItemRef = useRef<ActivityIndicator | null>(null) // Ref for the first item
+  const firstItemRef = useRef<View | null>(null)
   const measureFirstItemPosition = () => {
     if (firstItemRef.current) {
-      firstItemRef.current.measureInWindow((x, y) => {
-        const convertedToGridPoint = grid.convertToGridCoordinates(x, y)
-
+      firstItemRef.current.measureInWindow((x, y, width, height) => {
+        const convertedToGridPoint = grid.convertToGridCoordinates(
+          x + width / 2,
+          y + height / 2,
+        )
         setConfetti(
           getConfetti({
             origin: {
-              x: convertedToGridPoint.x + 1.45,
-              y: convertedToGridPoint.y - 1.65,
+              x: convertedToGridPoint.x,
+              y: convertedToGridPoint.y,
             },
             keepTrail: false,
           }),
@@ -247,7 +250,7 @@ export const List: React.FC = () => {
     setTimeout(() => {
       confettiOrchestrator.current?.run()
       setLoading(false)
-    }, 2000)
+    }, 1500)
   }
 
   const renderItem = useCallback(
@@ -299,9 +302,10 @@ export const List: React.FC = () => {
       </View>
       <Button
         style={styles.button}
+        disabled={loading}
         accessoryLeft={<Icon fill="white" name="plus" />}
         onPress={handleAddItem}>
-        ADD
+        ADD FRIEND
       </Button>
     </View>
   )

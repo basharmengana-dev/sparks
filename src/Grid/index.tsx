@@ -38,8 +38,8 @@ export class Grid {
 
   convertToGridCoordinates(x: number, y: number) {
     return {
-      x: Math.round(x / this.cellWidth),
-      y: Math.round((this.gridHeight - y) / this.cellHeight),
+      x: x / this.cellWidth,
+      y: (this.gridHeight - y) / this.cellHeight,
     }
   }
 

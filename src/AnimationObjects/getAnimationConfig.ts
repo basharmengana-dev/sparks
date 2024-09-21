@@ -27,8 +27,8 @@ export const getAnimationConfig = (
       return {
         tangentExtension: 5,
         strokeWidth: 1,
-        falloffBack: 0.5,
-        falloffFront: 0.9,
+        falloffBack: 0.1,
+        falloffFront: 0.1,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -36,8 +36,8 @@ export const getAnimationConfig = (
       return {
         tangentExtension: 5,
         strokeWidth: 2,
-        falloffBack: 0.5,
-        falloffFront: 0.9,
+        falloffBack: 0.1,
+        falloffFront: 0.1,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -45,8 +45,8 @@ export const getAnimationConfig = (
       return {
         tangentExtension: 6.5,
         strokeWidth: 3,
-        falloffBack: 0.5,
-        falloffFront: 0.9,
+        falloffBack: 0.1,
+        falloffFront: 0.1,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -54,8 +54,8 @@ export const getAnimationConfig = (
       return {
         tangentExtension: 20,
         strokeWidth: 4,
-        falloffBack: 0.5,
-        falloffFront: 0.9,
+        falloffBack: 0.1,
+        falloffFront: 0.1,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -63,8 +63,8 @@ export const getAnimationConfig = (
       return {
         tangentExtension: 22,
         strokeWidth: 5,
-        falloffBack: 0.5,
-        falloffFront: 1,
+        falloffBack: 0.2,
+        falloffFront: 0.2,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -72,8 +72,8 @@ export const getAnimationConfig = (
       return {
         tangentExtension: 22,
         strokeWidth: 6,
-        falloffBack: 0.5,
-        falloffFront: 1,
+        falloffBack: 0.4,
+        falloffFront: 0.6,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -82,7 +82,7 @@ export const getAnimationConfig = (
         tangentExtension: 22.5,
         strokeWidth: 7,
         falloffBack: 0.5,
-        falloffFront: 1,
+        falloffFront: 0.7,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
@@ -91,7 +91,7 @@ export const getAnimationConfig = (
         tangentExtension: 22.5,
         strokeWidth: 8,
         falloffBack: 0.5,
-        falloffFront: 1,
+        falloffFront: 0.7,
         searchThreshold: 0.5,
         tangentStartAdjustment: 5,
       }
