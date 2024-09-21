@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react'
+import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import {
   FlatList,
   Text,
@@ -17,6 +17,7 @@ import { Grid } from '../Grid'
 import { useSharedValue } from 'react-native-reanimated'
 import { RGBA } from '../AnimationObjects/ColorSchemas'
 import {
+  Confetti,
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
@@ -38,8 +39,8 @@ const grid = new Grid({
 
 interface ListItem {
   key: string
-  value: string
-  recipient: string
+  item: string
+  description: string
 }
 
 const ListItemComponent: React.FC<{ item: ListItem }> = React.memo(
@@ -48,13 +49,13 @@ const ListItemComponent: React.FC<{ item: ListItem }> = React.memo(
       <View style={styles.itemContainer}>
         <Image
           source={{
-            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.recipient}`,
+            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.item}`,
           }}
           style={styles.avatar}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.value}>£{item.value}</Text>
-          <Text style={styles.recipient}>{item.recipient}</Text>
+          <Text style={styles.value}>{item.item}</Text>
+          <Text style={styles.recipient}>{item.description}</Text>
         </View>
       </View>
     )
@@ -64,26 +65,27 @@ const ListItemComponent: React.FC<{ item: ListItem }> = React.memo(
 const NewItemComponent: React.FC<{
   item: ListItem
   loading: boolean
-}> = React.memo(({ item, loading }) => {
+  firstItemRef: React.RefObject<ActivityIndicator>
+}> = React.memo(({ item, loading, firstItemRef }) => {
   return (
     <View style={[styles.itemContainer, styles.newItemContainer]}>
       {loading ? (
         <View style={styles.avatarLoading}>
           <View style={styles.loaderContainer}>
-            <ActivityIndicator size="small" color="#0000ff" />
+            <ActivityIndicator size="small" color="#gray" ref={firstItemRef} />
           </View>
         </View>
       ) : (
         <Image
           source={{
-            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.recipient}`,
+            uri: `https://api.dicebear.com/9.x/initials/jpg?seed=${item.item}`,
           }}
           style={styles.avatar}
         />
       )}
       <View style={styles.textContainer}>
-        <Text style={styles.value}>£{item.value}</Text>
-        <Text style={styles.recipient}>{item.recipient}</Text>
+        <Text style={styles.value}>{item.item}</Text>
+        <Text style={styles.recipient}>{item.description}</Text>
       </View>
     </View>
   )
@@ -91,27 +93,57 @@ const NewItemComponent: React.FC<{
 
 export const List: React.FC = () => {
   const [data, setData] = useState<ListItem[]>([
-    { key: '1', value: '90', recipient: 'John Doe' },
-    { key: '2', value: '15', recipient: 'Jane Smith' },
-    { key: '3', value: '100', recipient: 'Sam Johnson' },
+    { key: '1', item: 'Oranges', description: '£2' },
+    { key: '2', item: 'Bananas', description: '£5' },
+    { key: '3', item: 'Kiwis', description: '£20' },
   ])
   const [newlyAddedKey, setNewlyAddedKey] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
+  const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 0.0])
+  const [confetti, setConfetti] = useState<Confetti[]>([])
+
+  const firstItemRef = useRef<ActivityIndicator | null>(null) // Ref for the first item
+  const measureFirstItemPosition = () => {
+    if (firstItemRef.current) {
+      firstItemRef.current.measureInWindow((x, y, width, height) => {
+        const convertedToGridPoint = grid.convertToGridCoordinates(x, y)
+
+        setConfetti(
+          getConfetti({
+            origin: {
+              x: convertedToGridPoint.x + 0.2,
+              y: convertedToGridPoint.y - 0.4,
+            },
+            keepTrail: false,
+          }),
+        )
+      })
+    }
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      measureFirstItemPosition()
+    }, 100)
+  }, [data])
 
   const handleAddItem = () => {
     // Trigger layout animation immediately
     setLoading(true)
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
 
-    const newItem = {
+    const newItem: ListItem = {
       key: String(data.length + 1),
-      value: String(Math.floor(Math.random() * 100)),
-      recipient: 'New Recipient',
+      item: 'Watermelon',
+      description: '£' + String(Math.floor(Math.random() * 100)),
     }
 
     setData(prevData => [...prevData, newItem])
     setNewlyAddedKey(newItem.key)
 
+    measureFirstItemPosition()
     setTimeout(() => {
       confettiOrchestrator.current?.run()
       setLoading(false)
@@ -121,23 +153,19 @@ export const List: React.FC = () => {
   const renderItem = useCallback(
     ({ item }: { item: ListItem }) => {
       if (item.key === newlyAddedKey) {
-        return <NewItemComponent item={item} loading={loading} />
+        return (
+          <NewItemComponent
+            item={item}
+            loading={loading}
+            firstItemRef={firstItemRef}
+          />
+        )
       } else {
         return <ListItemComponent item={item} />
       }
     },
     [newlyAddedKey, loading],
   )
-
-  const [confettiPoint, setConfettiPoint] = useState({ x: 4.2, y: 41.55 })
-  const confettiOrchestrator = useRef<ConfettiOrchestratorRef>(null)
-  const gridColor = useSharedValue<RGBA>([0.0, 0.0, 0.0, 0.0])
-  const confetti = useMemo(() => {
-    return getConfetti({
-      keepTrail: false,
-      origin: confettiPoint,
-    })
-  }, [])
 
   return (
     <View style={styles.container}>
