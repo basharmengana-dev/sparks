@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import {
   FlatList,
-  Text,
   View,
-  Image,
   StyleSheet,
   SafeAreaView,
   LayoutAnimation,
@@ -20,7 +18,7 @@ import {
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
 import { getConfetti } from '../ConfettiResource/Playground'
-import { Spinner, useTheme, Button, Icon } from '@ui-kitten/components'
+import { useTheme, Button, Icon } from '@ui-kitten/components'
 import { ListItem } from './types'
 import { ItemComponent } from './ItemComponent'
 import { getRandomFirstName } from './getRandomFirstName'
@@ -125,7 +123,7 @@ export const List: React.FC = () => {
     setTimeout(() => {
       confettiOrchestrator.current?.run()
       setLoading(false)
-    }, 1500)
+    }, 600)
   }
 
   const renderItem = useCallback(

@@ -1,5 +1,4 @@
 import { SkPoint } from '@shopify/react-native-skia'
-import { ColorSchemes } from '../AnimationObjects/ColorSchemas'
 import { Confetti } from '../Confetti/ConfettiOrchestration'
 
 export const getConfetti = ({
@@ -16,7 +15,7 @@ export const getConfetti = ({
     lineNumber: 7,
     startAngle: 10,
     lineGapAngle: 50,
-    strokeWidth: 'stroke/5',
+    strokeWidth: 'stroke/2',
     duration: 500,
     startAtprogressOrchestration: 0.0,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
@@ -34,7 +33,7 @@ export const getConfetti = ({
     lineNumber: 7,
     startAngle: 30,
     lineGapAngle: 50,
-    strokeWidth: 'stroke/6',
+    strokeWidth: 'stroke/3',
     duration: 650,
     startAtprogressOrchestration: 0.0,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
@@ -52,7 +51,7 @@ export const getConfetti = ({
     lineNumber: 7,
     startAngle: 40,
     lineGapAngle: 50,
-    strokeWidth: 'stroke/5',
+    strokeWidth: 'stroke/3',
     duration: 600,
     startAtprogressOrchestration: 0,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
@@ -70,7 +69,7 @@ export const getConfetti = ({
     lineNumber: 7,
     startAngle: 70,
     lineGapAngle: 50,
-    strokeWidth: 'stroke/4',
+    strokeWidth: 'stroke/2',
     duration: 750,
     startAtprogressOrchestration: 0,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
