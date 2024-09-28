@@ -124,7 +124,7 @@ export const List: React.FC = () => {
     setTimeout(() => {
       confettiOrchestrator.current?.run()
       setLoading(false)
-    }, 1000)
+    }, 1500)
   }
 
   const renderItem = useCallback(
