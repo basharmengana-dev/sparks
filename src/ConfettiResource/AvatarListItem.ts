@@ -10,7 +10,7 @@ export const getConfetti = ({
 }): Confetti[] => [
   {
     origin,
-    radius: 2.3,
+    radius: 2.5,
     radiusGap: 1.7,
     lineNumber: 7,
     startAngle: 10,
@@ -28,7 +28,7 @@ export const getConfetti = ({
   },
   {
     origin,
-    radius: 2.2,
+    radius: 2.4,
     radiusGap: 1.4,
     lineNumber: 7,
     startAngle: 30,
@@ -46,7 +46,7 @@ export const getConfetti = ({
   },
   {
     origin,
-    radius: 2.1,
+    radius: 2.2,
     radiusGap: 2,
     lineNumber: 7,
     startAngle: 40,
@@ -64,7 +64,7 @@ export const getConfetti = ({
   },
   {
     origin,
-    radius: 1.5,
+    radius: 2.2,
     radiusGap: 3,
     lineNumber: 7,
     startAngle: 70,

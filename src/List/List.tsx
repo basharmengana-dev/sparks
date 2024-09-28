@@ -17,7 +17,8 @@ import {
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
-import { getConfetti } from '../ConfettiResource/Playground'
+import { getConfetti as getSimple1Confetti } from '../ConfettiResource/AvatarListItem'
+import { getConfetti as getLoop1Confetti } from '../ConfettiResource/Playground'
 import { useTheme, Button, Icon } from '@ui-kitten/components'
 import { ListItem } from './types'
 import { ItemComponent } from './ItemComponent'
@@ -84,8 +85,9 @@ export const List: React.FC = () => {
           x + width / 2,
           y + height / 2,
         )
+
         setConfetti(
-          getConfetti({
+          getLoop1Confetti({
             origin: {
               x: convertedToGridPoint.x,
               y: convertedToGridPoint.y,
@@ -116,14 +118,13 @@ export const List: React.FC = () => {
     setData(prevData => [...prevData, newItem])
     setNewlyAddedKey(newItem.key)
 
-    measureFirstItemPosition()
     setTimeout(() => {
       flatListRef.current?.scrollToIndex({ index: data.length, animated: true })
-    }, 500)
+    }, 800)
     setTimeout(() => {
       confettiOrchestrator.current?.run()
       setLoading(false)
-    }, 600)
+    }, 1000)
   }
 
   const renderItem = useCallback(
