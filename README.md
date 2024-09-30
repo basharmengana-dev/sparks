@@ -4,5 +4,7 @@ A react native project that uses react native skia (https://github.com/Shopify/r
 
 ### Sample animations
 
+Press on links below to download the videos displaying the animation.
+
 ![Loop animation](./videos/Loop.MP4)
 ![Straight line animation](./videos/Loop.MP4)
