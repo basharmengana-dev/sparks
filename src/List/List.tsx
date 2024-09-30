@@ -17,8 +17,9 @@ import {
   ConfettiOrchestrator,
   ConfettiOrchestratorRef,
 } from '../Confetti/ConfettiOrchestration'
-import { getConfetti as getSimple1Confetti } from '../ConfettiResource/AvatarListItem'
-import { getConfetti as getLoop1Confetti } from '../ConfettiResource/Playground'
+import { getConfetti as getSimpleConfetti } from '../ConfettiResource/AvatarListItem'
+import { getConfetti as getLoopConfetti } from '../ConfettiResource/Playground'
+import { getConfetti as getFireworks } from '../ConfettiResource/Fireworks'
 import { useTheme, Button, Icon } from '@ui-kitten/components'
 import { ListItem } from './types'
 import { ItemComponent } from './ItemComponent'
@@ -87,13 +88,7 @@ export const List: React.FC = () => {
         )
 
         setConfetti(
-          getLoop1Confetti({
-            origin: {
-              x: convertedToGridPoint.x,
-              y: convertedToGridPoint.y,
-            },
-            keepTrail: false,
-          }),
+          getFireworks({ origin: convertedToGridPoint, keepTrail: false }),
         )
       })
     }
