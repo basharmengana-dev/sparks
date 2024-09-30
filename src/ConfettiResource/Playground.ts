@@ -157,14 +157,14 @@ export const getConfetti = ({
   },
   {
     origin,
-    radius: 1.8,
-    radiusGap: 3,
+    radius: 2.2,
+    radiusGap: 3.5,
     lineNumber: 12,
-    startAngle: 33,
+    startAngle: 25,
     lineGapAngle: 30,
-    strokeWidth: 'stroke/2',
+    strokeWidth: 'stroke/4',
     duration: 500,
-    startAtprogressOrchestration: 0.3,
+    startAtprogressOrchestration: 0.7,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
     colorsWithBreakpoints: [
       // turkois lipstick red

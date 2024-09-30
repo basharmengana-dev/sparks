@@ -16,8 +16,8 @@ export const getConfetti = ({
     startAngle: 10,
     lineGapAngle: 30,
     strokeWidth: 'stroke/2',
-    duration: 300,
-    startAtprogressOrchestration: 0.0,
+    duration: 400,
+    startAtprogressOrchestration: 0.4,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
     colorsWithBreakpoints: [
       { breakpoint: 0, color: [250 / 255, 145 / 255, 238 / 255, 0] },
@@ -34,8 +34,8 @@ export const getConfetti = ({
     startAngle: 30,
     lineGapAngle: 30,
     strokeWidth: 'stroke/3',
-    duration: 450,
-    startAtprogressOrchestration: 0.0,
+    duration: 400,
+    startAtprogressOrchestration: 0.55,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
     colorsWithBreakpoints: [
       { breakpoint: 0, color: [7 / 255, 176 / 255, 43 / 255, 1] },
@@ -53,7 +53,7 @@ export const getConfetti = ({
     lineGapAngle: 30,
     strokeWidth: 'stroke/3',
     duration: 400,
-    startAtprogressOrchestration: 0,
+    startAtprogressOrchestration: 0.15,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
     colorsWithBreakpoints: [
       { breakpoint: 0, color: [80 / 255, 142 / 255, 249 / 255, 1] },
@@ -70,8 +70,8 @@ export const getConfetti = ({
     startAngle: 70,
     lineGapAngle: 30,
     strokeWidth: 'stroke/2',
-    duration: 550,
-    startAtprogressOrchestration: 0,
+    duration: 400,
+    startAtprogressOrchestration: 0.25,
     destructAtFrontProgress: keepTrail ? 1 : 0.4,
     colorsWithBreakpoints: [
       { breakpoint: 0, color: [247 / 255, 222 / 255, 38 / 255, 1] },

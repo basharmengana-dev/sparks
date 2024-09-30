@@ -88,7 +88,7 @@ export const List: React.FC = () => {
         )
 
         setConfetti(
-          getFireworks({ origin: convertedToGridPoint, keepTrail: false }),
+          getSimpleConfetti({ origin: convertedToGridPoint, keepTrail: false }),
         )
       })
     }
