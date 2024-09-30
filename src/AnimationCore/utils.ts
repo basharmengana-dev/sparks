@@ -1,3 +1,6 @@
+// The util code below is from this repo
+// https://github.com/wcandillon/can-it-be-done-in-react-native/blob/master/bonuses/skia-examples/src/Generators/Animations.ts
+
 import { useEffect, useState } from 'react'
 import type { SharedValue } from 'react-native-reanimated'
 import {
